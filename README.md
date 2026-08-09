@@ -32,6 +32,30 @@ For standalone local experimentation, ask `$skill-installer` to install `chile-d
 https://github.com/stratolark/chile-data-protection-api-skill/tree/main/plugins/chile-data-protection-api/skills/chile-data-protection-api
 ```
 
+## Update
+
+Refresh the marketplace snapshot to update the installed plugin:
+
+```text
+codex plugin marketplace upgrade chile-data-protection
+```
+
+Run `codex plugin list` to confirm the installed version, then start a new Codex thread.
+
+## Remove
+
+Remove the installed plugin:
+
+```text
+codex plugin remove chile-data-protection-api@chile-data-protection
+```
+
+To also remove the marketplace source:
+
+```text
+codex plugin marketplace remove chile-data-protection
+```
+
 ## Use
 
 Invoke the skill explicitly:
