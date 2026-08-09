@@ -1,0 +1,20 @@
+{
+  "name": "chile-data-protection",
+  "interface": {
+    "displayName": "Chile Data Protection"
+  },
+  "plugins": [
+    {
+      "name": "chile-data-protection-api",
+      "source": {
+        "source": "local",
+        "path": "./plugins/chile-data-protection-api"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

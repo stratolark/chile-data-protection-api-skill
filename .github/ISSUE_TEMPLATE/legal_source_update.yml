@@ -1,0 +1,47 @@
+name: Legal source update
+description: Report a new or changed official Chilean source.
+title: "[Legal source]: "
+labels:
+  - legal-source
+body:
+  - type: markdown
+    attributes:
+      value: This form tracks source maintenance, not requests for legal advice.
+  - type: input
+    id: official_url
+    attributes:
+      label: Official source URL
+      placeholder: https://www.bcn.cl/...
+    validations:
+      required: true
+  - type: input
+    id: provision
+    attributes:
+      label: Provision or article
+    validations:
+      required: true
+  - type: input
+    id: verified_date
+    attributes:
+      label: Verification date
+      description: Use YYYY-MM-DD.
+    validations:
+      required: true
+  - type: dropdown
+    id: regime
+    attributes:
+      label: Affected legal operating regime
+      options:
+        - CURRENT_LAW_THROUGH_2026_11_30
+        - TRANSITION_PREPARATION_FOR_2026_REFORM
+        - AMENDED_LAW_FROM_2026_12_01
+        - Requires investigation
+    validations:
+      required: true
+  - type: textarea
+    id: engineering_impact
+    attributes:
+      label: Possible engineering impact
+      description: Separate confirmed source text from interpretation or recommendations.
+    validations:
+      required: true

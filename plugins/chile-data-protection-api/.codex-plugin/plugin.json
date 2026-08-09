@@ -1,0 +1,30 @@
+{
+  "name": "chile-data-protection-api",
+  "version": "0.1.0",
+  "description": "Audit, design, and implement Chilean personal-data API workflows without claiming legal compliance.",
+  "author": {
+    "name": "stratolark",
+    "url": "https://github.com/stratolark"
+  },
+  "homepage": "https://github.com/stratolark/chile-data-protection-api",
+  "repository": "https://github.com/stratolark/chile-data-protection-api",
+  "license": "MIT",
+  "keywords": [
+    "chile",
+    "data-protection",
+    "privacy",
+    "api",
+    "rut"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Chile Data Protection API",
+    "shortDescription": "Engineer Chilean personal-data API workflows.",
+    "longDescription": "Audit, design, or implement backend API capabilities for Chilean personal-data processing. This engineering aid does not provide legal advice or certify compliance.",
+    "developerName": "stratolark",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "websiteURL": "https://github.com/stratolark/chile-data-protection-api",
+    "defaultPrompt": "Audit this API for Chilean data-protection engineering gaps."
+  }
+}
