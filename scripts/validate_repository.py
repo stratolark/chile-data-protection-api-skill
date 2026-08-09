@@ -18,6 +18,7 @@ OPENAI_YAML = SKILL_ROOT / "agents" / "openai.yaml"
 PLUGIN_JSON = PLUGIN_ROOT / ".codex-plugin" / "plugin.json"
 MARKETPLACE_JSON = ROOT / ".agents" / "plugins" / "marketplace.json"
 EVALS_JSON = ROOT / "evals" / "cases.json"
+RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release.yml"
 
 EXPECTED_SKILL_NAME = "chile-data-protection-api"
 EXPECTED_MARKETPLACE_NAME = "chile-data-protection"
@@ -221,6 +222,17 @@ def validate_workflow_pins(validation: Validation) -> None:
         validation.require(bool(re.fullmatch(r"[0-9a-f]{40}", pin)), f"Workflow action is not pinned to a commit SHA: {pin}")
 
 
+def validate_release_workflow(validation: Validation) -> None:
+    validation.require(RELEASE_WORKFLOW.is_file(), "Missing release workflow")
+    if not RELEASE_WORKFLOW.is_file():
+        return
+
+    text = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+    validation.require('tags:\n      - "v*"' in text, "Release workflow must run for version tags")
+    validation.require("permissions:\n  contents: write" in text, "Release workflow must permit release creation")
+    validation.require('--repo "$GITHUB_REPOSITORY"' in text, "Release workflow must select its repository without a checkout")
+
+
 def main() -> int:
     validation = Validation()
     validate_skill(validation)
@@ -232,6 +244,7 @@ def main() -> int:
     validate_repository_hygiene(validation)
     validate_local_markdown_links(validation)
     validate_workflow_pins(validation)
+    validate_release_workflow(validation)
 
     if validation.failures:
         for failure in validation.failures:
