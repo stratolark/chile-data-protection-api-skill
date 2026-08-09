@@ -9,7 +9,6 @@ Use this reference for every audit, design, or implementation. Select the applic
 - Simplicity and standard-practice gate
 - Legal baseline posture
 - Strict engineering posture
-- Tailored posture
 - Identifier and RUT controls
 - Audit and implementation behavior
 
@@ -17,7 +16,8 @@ Use this reference for every audit, design, or implementation. Select the applic
 
 - **Legal baseline**: Implement verified legal requirements for the selected period and the least-complex technical and organizational controls justified by actual risk. This is not a low-security mode and does not certify compliance.
 - **Strict security default**: Apply the legal baseline plus conservative security and privacy defaults. Recommend this posture for a new system that processes natural-person RUT or other high-impact identifiers.
-- **Tailored controls**: Apply the legal baseline plus a selected subset of stricter controls supported by the threat model and operational constraints.
+
+If the user requests individual strict controls, start from the legal baseline and add only those controls. Report the selected controls directly. Do not create a third posture name.
 
 The posture does not decide the purpose, lawful basis, necessity, retention period, legal hold, controller role, or statutory exception. Describe an unresolved item by its domain name, such as `retention period`, instead of assigning an internal code.
 
@@ -93,10 +93,6 @@ Apply all applicable baseline controls and these defaults unless a control is te
 Strict mode is not permission to add unused cryptography, duplicate identifiers, or speculative infrastructure. Skip an irrelevant control and record why it is not applicable.
 
 Reuse the host platform's proven encryption, secret-management, authentication, authorization, validation, migration, job, telemetry, and testing capabilities before adding dependencies or parallel frameworks. Never invent cryptographic primitives. Do not create a privacy microservice, generic adapter framework, queue, outbox, or event-sourced model unless a present boundary or failure mode requires it.
-
-## Tailored controls
-
-Implement the legal baseline plus the stricter controls selected by the user or supported by the current threat model. State the selected controls and their current tradeoff. Mention an omitted strict control only when it materially affects the requested slice.
 
 ## Identifier and RUT controls
 

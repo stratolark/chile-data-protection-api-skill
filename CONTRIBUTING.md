@@ -6,17 +6,17 @@ Thank you for improving this project.
 
 - Open an issue for a material change to legal interpretation, public behavior, or plugin structure.
 - Do not submit confidential information, credentials, production logs, identity documents, or real personal data.
-- Use synthetic data in examples and evaluation fixtures.
+- Use synthetic data in examples and forward-test prompts.
 - Keep the skill framework-agnostic unless a reference explicitly covers a variant.
 
 ## Make a change
 
 1. Create a focused branch from `main`.
 2. Keep one purpose per pull request.
-3. Preserve the distinction between legal requirements, engineering recommendations, assumptions, and `LEGAL_INPUT_REQUIRED` decisions.
-4. Add or update an evaluation case when behavior changes.
+3. Preserve the distinction between legal requirements, engineering recommendations, implementation assumptions, and missing legal facts.
+4. Forward-test changed skill behavior with a realistic prompt.
 5. Run `python scripts/validate_repository.py`.
-6. Describe the exact validation result in the pull request.
+6. Describe the validation and forward-test results in the pull request.
 
 ## Legal-source changes
 

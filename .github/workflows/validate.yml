@@ -23,5 +23,5 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validate plugin, skill, and evaluations
+      - name: Validate plugin and skill
         run: python scripts/validate_repository.py

@@ -8,7 +8,8 @@ For audits and implementations, it keeps the applicable legal regime separate fr
 
 - **Legal baseline** implements verified legal requirements and the least-complex controls justified by actual risk.
 - **Strict security default** adds conservative identifier, encryption, lookup, telemetry, export, and abuse-resistance defaults.
-- **Tailored controls** applies the legal baseline plus a selected subset of strict controls.
+
+The user can add individual strict controls to the legal baseline without creating another posture.
 
 An audit with no posture specified reports legal gaps and strict-security recommendations separately. An implementation uses strict mode as the recommended default unless the user selects another posture.
 
@@ -101,7 +102,6 @@ plugins/chile-data-protection-api/
     SKILL.md
     agents/openai.yaml
     references/
-evals/cases.json
 scripts/validate_repository.py
 ```
 
@@ -115,11 +115,11 @@ Run the dependency-free repository validator:
 python scripts/validate_repository.py
 ```
 
-The validator checks plugin and marketplace metadata, skill frontmatter, reference paths, legal-regime guardrails, UI metadata, evaluation fixtures, and common secret or placeholder patterns.
+The validator checks plugin and marketplace metadata, skill frontmatter, reference paths, official-source metadata, UI metadata, workflows, links, and repository hygiene.
 
 ## Contributing and security
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements and [SECURITY.md](SECURITY.md) for private vulnerability reporting. Do not place real personal data, credentials, identity documents, or production logs in issues, pull requests, or evaluation fixtures.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements and [SECURITY.md](SECURITY.md) for private vulnerability reporting. Do not place real personal data, credentials, identity documents, or production logs in issues, pull requests, or test prompts.
 
 ## Resumen en español
 
@@ -129,7 +129,7 @@ No entrega asesoría legal ni certifica cumplimiento. La habilidad usa una base 
 
 La habilidad recomienda una solución técnica y ofrece opciones concretas. Solo agrega configuración que el código usa. No crea registros de decisiones ni documentos de seguimiento por defecto.
 
-El equipo puede elegir una base legal, una postura de seguridad estricta o controles personalizados. Si no elige, la habilidad usa la postura estricta como supuesto recomendado.
+El equipo puede elegir la base legal o la postura de seguridad estricta. También puede agregar controles estrictos concretos a la base legal. Si no elige, la habilidad usa la postura estricta como supuesto recomendado.
 
 ## License
 

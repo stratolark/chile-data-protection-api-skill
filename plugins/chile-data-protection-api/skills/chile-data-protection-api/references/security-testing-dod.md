@@ -155,7 +155,7 @@ For the legal baseline, confirm that the result uses established repository arch
 
 For the strict security default, confirm that each applicable identifier, storage, lookup, telemetry, export, and enumeration control is implemented and tested. Report skipped controls only when they affect the changed slice.
 
-For tailored controls, state the selected controls and current tradeoffs in the response. Do not create a control log.
+If the user selects individual strict controls, test those controls and state their current tradeoffs. Do not create a control log.
 
 ## Final report
 

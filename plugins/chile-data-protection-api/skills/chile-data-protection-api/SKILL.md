@@ -70,7 +70,6 @@ Choose one posture from `references/engineering-postures.md`:
 
 - Legal baseline
 - Strict security default
-- Tailored controls
 
 The legal period determines which law applies. The security posture determines how conservative the technical controls are beyond exact statutory requirements.
 
@@ -80,6 +79,7 @@ The legal period determines which law applies. The security posture determines h
 - Do not stop to ask for a posture choice
 - Offer alternatives only when they change cost, migration risk, operations, or public behavior
 - Never remove an existing stronger control merely because the user selects the legal baseline
+- If the user requests individual strict controls, apply them on top of the legal baseline without naming a third posture
 - Apply the simplicity gate before proposing architecture. Reuse repository mechanisms and require a present need or concrete risk
 
 ## Give the developer a solution
