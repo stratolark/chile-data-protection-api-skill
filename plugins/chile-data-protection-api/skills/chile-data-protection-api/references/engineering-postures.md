@@ -1,138 +1,77 @@
 # Engineering postures
 
-Use this reference for every audit, design, or implementation. Select the applicable legal period first, then select a security posture independently.
+Select security controls separately from the applicable legal period. A posture does not decide the processing purpose, lawful basis, retention period, legal hold, controller role, or statutory exception.
 
-## Contents
+## Choose one posture
 
-- Posture selection
-- Recommendation basis
-- Simplicity and standard-practice gate
-- Legal baseline posture
-- Strict engineering posture
-- Identifier and RUT controls
-- Audit and implementation behavior
+- **Legal baseline**: Implement the behavior required by the applicable Chilean regime with proportionate security based on the repository's actual risk
+- **Strict security default**: Apply the legal baseline plus conservative controls for identifiers, storage, lookup, telemetry, exports, and enumeration
 
-## Select one posture
+Honor the user's choice. For an audit without a choice, report legal gaps separately from optional strict controls. For implementation without a choice, recommend the strict security default as a reversible assumption.
 
-- **Legal baseline**: Implement verified legal requirements for the selected period and the least-complex technical and organizational controls justified by actual risk. This is not a low-security mode and does not certify compliance.
-- **Strict security default**: Apply the legal baseline plus conservative security and privacy defaults. Recommend this posture for a new system that processes natural-person RUT or other high-impact identifiers.
+Individual strict controls can be added to the legal baseline without creating another named posture.
 
-If the user requests individual strict controls, start from the legal baseline and add only those controls. Report the selected controls directly. Do not create a third posture name.
+## Explain why a control exists
 
-The posture does not decide the purpose, lawful basis, necessity, retention period, legal hold, controller role, or statutory exception. Describe an unresolved item by its domain name, such as `retention period`, instead of assigning an internal code.
+Use these descriptions only when the distinction changes the decision:
 
-Do not stop implementation for every unresolved fact. Use `references/developer-decision-guide.md` to select a reversible path and apply the legal-blocker test.
+- `Law`: required by a cited applicable provision
+- `Required risk control`: needed to make the current design safe or reliable
+- `Standard engineering practice`: established repository or platform practice
+- `Strict security`: optional hardening beyond the legal minimum
 
-Never remove or weaken an existing stronger control merely because the legal baseline is selected. Treat removal as a separate security change requiring evidence and user authorization.
+Do not describe an omitted strict control as legal noncompliance.
 
-## Explain the basis only when it matters
+## Simplicity gate
 
-Use plain language to distinguish:
+Add a mechanism only when at least one condition is present:
 
-- A legal requirement tied to a cited provision and applicable period
-- Standard engineering practice needed for a correct production system
-- A risk-based control selected for an identified threat or legal duty
-- A stricter security choice that the law does not prescribe in that exact form
-- A missing legal or business fact that code cannot establish
-- A reversible implementation assumption
+- Current behavior or a verified requirement needs it
+- It protects authorization, integrity, confidentiality, availability, recovery, or compatibility
+- It isolates a real external, persistence, security, ownership, or process boundary
+- Multiple current consumers need the same invariant
+- Repository evidence shows that a direct implementation would create material duplication or drift
 
-Do not add a classification tag to every finding. State the basis where the distinction changes priority, scope, or the user's understanding.
+Prefer an established repository pattern. Do not add a service, interface, queue, outbox, event history, approval workflow, policy object, or dependency for a hypothetical future need.
 
-Do not report a missing stricter control as legal noncompliance. The legal baseline never permits omission of authentication, authorization, tenant isolation, confidentiality, integrity, availability, or controls needed for an identified material risk.
+## Legal baseline controls
 
-## Simplicity and standard-practice gate
+- Enforce authentication, authorization, ownership, and tenant scope at the service that owns the action
+- Validate personal-data inputs needed for correctness and safe processing
+- Apply security controls proportionate to the data, exposure, threat model, and platform
+- Keep personal data out of telemetry unless a current operational need justifies the field and its protection
+- Protect exports and temporary artifacts according to their exposure and lifetime
+- Reuse current audit, configuration, migration, job, incident, and vendor mechanisms
+- Preserve stronger controls already present in the repository
 
-Strict security means stronger justified controls, not more architecture.
+The legal baseline does not universally require UUIDs, field-level encryption, HMAC lookup columns, a privacy microservice, or a specific infrastructure location.
 
-Before recommending or adding a table, service, worker, queue, event stream, state machine, dependency, cryptographic layer, configuration flag, or abstraction:
+## Strict security controls
 
-1. Identify the current legal, product, security, or operational requirement it satisfies
-2. Confirm that the problem exists in the inspected repository or is a committed deployment requirement
-3. Search for an established repository mechanism that can satisfy it
-4. Prefer a direct implementation at the existing boundary over a new subsystem
-5. Name the failure prevented and verify that the benefit is proportionate to key management, migrations, monitoring, on-call, testing, and maintenance cost
-6. Defer speculative extensibility, unused adapters, premature asynchronous processing, and framework changes
+Apply only controls relevant to the data and changed behavior:
 
-Preserve input validation, authorization, data integrity, transaction safety, required idempotency, error handling, rollback, compatibility, operational diagnostics, and behavior-focused tests. Do not call their removal “simplification.”
+- Use opaque surrogate identifiers in public contracts instead of natural-person RUT
+- Normalize and validate RUT on the server
+- Protect recoverable canonical RUT with established encryption and separate key management
+- Use a keyed lookup value such as HMAC only when exact RUT lookup is required
+- Keep raw personal identifiers out of routes, tokens, logs, traces, metrics, analytics, filenames, object names, cache keys, and queue metadata
+- Encrypt stored personal-data export artifacts
+- Use short-lived authenticated export retrieval
+- Add enumeration resistance where lookup or recovery endpoints expose whether a person exists
+- Test actual telemetry output for personal-data leakage
 
-For a nontrivial recommendation, name the current requirement or risk, the repository pattern reused, the smallest complete control, and its operational cost. Add expansion criteria only when a known near-term change requires them.
+Use proven platform or library primitives. Never invent encryption or hashing schemes.
 
-If no present requirement or proportionate safety benefit justifies a mechanism, do not recommend it.
-
-## Legal baseline
-
-Implement only:
-
-1. Applicable legal requirements for the verified period
-2. Standard engineering controls consistent with the repository and deployment model
-3. Risk-based measures supported by the system's data flows, threat model, sector, and operational context
-4. Existing repository security requirements and stronger controls already in place
-
-Prefer the smallest durable design. Explain a rejected strict control only when it affects the current request. Legal or privacy owners supply legal conclusions. The security owner accepts material residual risk under the organization's normal process.
-
-Examples:
-
-- The law requires appropriate security or due diligence. It does not universally require application-level field encryption.
-- A stable surrogate database key can be sufficient internally. A UUID is not legally required.
-- Personal data can appear in necessary operational records. Apply access controls, the applicable retention rule, and suitable protection. Do not copy it into telemetry without a defined purpose.
-
-## Strict security default
-
-Apply all applicable baseline controls and these defaults unless a control is technically irrelevant or conflicts with a verified legal obligation:
-
-- Use a non-RUT surrogate subject identifier. Use opaque, non-meaningful identifiers in public contracts.
-- Normalize and validate natural-person RUT on the server.
-- Encrypt recoverable canonical RUT at the application or equivalent protection boundary.
-- When exact RUT lookup is required, use a deterministic keyed lookup value such as HMAC. Do not use an unkeyed hash over the enumerable RUT space.
-- Keep encryption and lookup keys outside the primary data store with versioning, rotation, and recovery procedures.
-- Keep raw personal identifiers out of URLs, bearer tokens, client-visible sessions, logs, traces, metric labels, analytics events, filenames, object names, queue names, cache keys, partition keys, and idempotency keys.
-- Use generic external responses and rate limits when validation, registration, or lookup behavior can enable enumeration.
-- Use step-up authentication for high-risk exports or identity changes when the host application's risk warrants it.
-- Encrypt personal-data export artifacts at rest and deliver them through short-lived authenticated retrieval.
-
-Strict mode is not permission to add unused cryptography, duplicate identifiers, or speculative infrastructure. Skip an irrelevant control and record why it is not applicable.
-
-Reuse the host platform's proven encryption, secret-management, authentication, authorization, validation, migration, job, telemetry, and testing capabilities before adding dependencies or parallel frameworks. Never invent cryptographic primitives. Do not create a privacy microservice, generic adapter framework, queue, outbox, or event-sourced model unless a present boundary or failure mode requires it.
-
-## Identifier and RUT controls
-
-Treat classification and implementation separately.
+## Identifier controls
 
 | Concern | Legal baseline | Strict security default |
 | --- | --- | --- |
-| Natural-person RUT/RUN | Treat as personal data and justify collection, use, disclosure, retention, and security | Baseline plus surrogate identity, field protection, and exclusion from public or telemetry identifiers |
-| Company RUT | Do not classify it as personal data solely because it identifies a legal entity. Check whether the record also concerns a natural person | Do not use it as a security credential. Protect it according to business and sector risk |
-| Name, email, phone, address | Treat as personal data when linked or reasonably linkable to a natural person | Keep raw values out of telemetry and infrastructure identifiers by default |
-| Validation | Validate inputs needed for correctness and safe processing | Normalize and check natural-person RUT using a tested Modulo 11 implementation |
-| Identity proof | Do not treat an identifier as authentication | A valid check digit proves syntax, not existence, ownership, or identity |
-| Storage | Select access control, encryption, segregation, and retention measures from risk | Encrypt recoverable RUT and segregate keys from the primary store |
-| Exact lookup | Use the least-exposing design for the use case | Use keyed deterministic lookup when lookup is required. Omit it when no lookup exists |
-| Public identifiers | Enforce authorization regardless of identifier shape | Do not expose natural-person RUT. Prefer opaque non-enumerable identifiers |
-| Telemetry | Define purpose, fields, access, retention, and redaction. Reject unjustified raw personal data | Assert that raw personal data is absent unless an explicit reviewed exception exists |
+| Natural-person RUT or RUN | Treat as personal data and justify collection, use, disclosure, retention, and protection | Add a surrogate identity and keep RUT out of public and telemetry identifiers |
+| Company RUT | Do not classify it as personal data solely because it identifies a legal entity. Reassess when it concerns a natural person | Do not use it as a credential. Protect it according to business and sector risk |
+| Validation | Validate inputs needed for correct processing | Normalize and check natural-person RUT using a tested Modulo 11 implementation |
+| Authentication | Require proof appropriate to the requested action | Add step-up authentication for high-impact disclosure or changes |
+| Lookup | Authorize the operation and prevent inappropriate enumeration | Use a keyed lookup value when exact search is required |
+| Storage | Select access control, encryption, segregation, and retention from risk | Protect recoverable RUT and keep keys outside the primary store |
+| Telemetry | Define purpose, access, retention, and redaction for any personal field | Assert through tests that raw personal values are absent |
 
-RUT, name, email, phone, and address are not sensitive data merely by category. Context or combination can reveal sensitive information or create high impact. As a result, the risk classification can be higher than the statutory category suggests.
-
-## Audit behavior
-
-If the user does not select a posture, produce a dual-track audit:
-
-1. Legal gaps and required risk controls
-2. Stricter security recommendations with cost and benefit
-
-Keep legal impact and strict-security impact in separate fields. Do not ask a blocking posture question when both tracks can be reported.
-
-## Implementation behavior
-
-If the user selects a posture, implement it. If no posture is selected, recommend the strict security default as a reversible implementation assumption.
-
-Do not pause only to ask which posture to use. Ask only when the choice creates a material cost, migration, compatibility, or operational tradeoff.
-
-When a choice is necessary, provide at most three options. Recommend one option from repository evidence and state the cost of each option.
-
-Before editing, select the posture and applicable controls in working analysis. After editing, report strict controls only when they changed the requested slice. Under the legal baseline, explain a material omitted strict control through the identified risk. Do not claim that it is legally unnecessary in every context.
-
-Add runtime configuration only for values that code consumes. Use the repository's existing configuration mechanism.
-
-Do not create a generic privacy configuration object, approval workflow, or decision log. Keep missing values absent and fail safely at the dependent action.
-
-When a legal or business fact is missing, implement draft states and safe failure behavior. Disable a production action only when the legal-blocker test passes.
+RUT, name, email, phone, and address are not sensitive data merely by category. Their context or combination can still create high impact and justify stronger controls.

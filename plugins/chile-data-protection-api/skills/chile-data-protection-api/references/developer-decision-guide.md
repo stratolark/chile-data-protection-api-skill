@@ -1,84 +1,58 @@
-# Developer decisions and legal preconditions
+# Missing facts and safe defaults
 
-Use this guide when a missing legal or business fact affects implementation. Give the developer a working technical path and keep any disabled behavior as narrow as possible.
+Use this reference when a legal or business fact is missing. Keep the distinction between facts supplied by the organization and technical choices the developer can make.
 
-## Separate facts from design choices
+## Facts and design choices
 
-The skill must decide technical matters from repository evidence and established engineering practice. Examples include:
+Legal or business owners must establish facts such as:
 
-- Route and command shape
-- Module and service boundaries
-- Database schema and migration mechanics
-- Runtime configuration placement
-- Identifier representation
-- Authentication and identity-verification mechanics
-- Authorization and tenant enforcement
-- Validation, error handling, telemetry, jobs, and tests
-- Rollout, retries, idempotency, and recovery when the current boundary needs them
+- Controller or processor role
+- Processing purpose and lawful basis
+- Required retention period, statutory start event, hold, or exception
+- Final notice text and controller contact
+- Grounds for refusing or limiting a request
+- Applicable sector rule or transfer mechanism
 
-Do not ask legal or privacy teams to approve these choices unless the organization already has a relevant deployment control.
+Developers can choose routes, schemas, configuration placement, jobs, validation, authorization, identity-verification mechanics, migration strategy, telemetry controls, and test design. Make these choices from repository evidence and standard engineering practice.
 
-The skill cannot invent facts that belong to the controller or applicable law. Examples include:
-
-- Who the controller is for the processing activity
-- Why the data is processed and which lawful basis applies
-- The final notice content
-- A retention period or statutory hold
-- A legal exception, refusal ground, or transfer mechanism
-
-These facts do not stop unrelated engineering work.
+Missing source-code evidence does not prove that an existing purpose, lawful basis, notice, contract, or approval is absent.
 
 ## Legal-blocker test
 
-Keep a production action disabled only when all four statements are true:
+Disable a production action only when all four conditions are true:
 
-1. A provision in the selected legal regime or a verified sector rule makes the missing fact a precondition for that action
-2. The fact cannot be established from the repository or the user's supplied context
-3. Performing the action without the fact creates a concrete legal violation or a false required representation
-4. No safe, reversible implementation assumption can allow that same action to run
+1. The action would perform processing whose legality depends on the missing fact
+2. A cited provision or verified sector rule makes that fact a precondition
+3. No repository evidence supplies the fact
+4. No narrower safe behavior can preserve the action
 
-If any statement is false, do not call it a legal blocker. Select the technical solution and continue.
+Name the one action that remains disabled. Continue schemas, configuration, dry runs, tests, manual review, and other reversible work.
 
-Always cite the provision or verified rule. If the source is unclear, report a legal limitation and offer a source refresh. Do not stop implementation on an uncited concern.
+An internal approval process is an organizational dependency unless a cited rule makes approval a legal precondition.
 
-## Common decisions
+## Default decisions
 
-| Domain concept | Technical solution the skill must provide | Fact the skill must not invent | Narrow action that can remain disabled |
+| Area | Implement now | Fact still needed | Narrow safe behavior |
 | --- | --- | --- | --- |
-| Controller and tenancy | Match controller lookup and request scope to existing tenancy and authorization | Which organization controls each processing activity | Publishing a controller claim when the required identity is unknown |
-| Purpose and lawful basis | Separate required service behavior from optional processing and enforce purpose at the server boundary | The actual purpose and lawful basis | Enabling the new processing activity |
-| Privacy notice | Implement versioned draft, preview, publication, and evidence only when the product needs them | Final notice content and effective date | Publishing the notice or starting processing that legally requires it |
-| Rights requests | Reuse authentication for current users and a proportionate recovery or manual-review path for others | A legal refusal ground or exception | Disclosure, erasure, or automatic refusal when its legal precondition is unresolved |
-| Retention and holds | Implement eligibility calculation, dry run, bounded execution, audit, and recovery using existing job patterns | The retention period, start event when legally defined, and applicable hold | Destructive deletion for the affected category |
-| International transfer | Reuse the current vendor and region boundaries, restrict destinations, and record delivery | The applicable transfer mechanism or permitted recipient | Sending personal data to the unresolved destination |
+| Purpose and lawful basis | Separate required service behavior from optional processing. Enforce purpose server-side | Actual purpose and lawful basis | Keep only new optional processing off |
+| Notice | Implement versioned presentation and evidence when the product needs them | Approved content and controller details | Keep draft content unpublished |
+| Rights requests | Implement intake, tenant scope, status, deadlines, and manual review | Refusal grounds and exceptional handling | Accept requests but do not disclose or erase before identity is verified |
+| Identity verification | Reuse the least intrusive existing method appropriate to the action | Organization-specific exceptional rules | Route uncertain cases to manual review |
+| Retention and holds | Use an existing consumed value or choose a provisional runtime default | Any controlling statutory period, hold, or exception | Start with eligibility and dry-run output when deletion risk is uncertain |
+| Processors and transfers | Reuse current vendor and delivery records | Roles, contractual terms, and transfer mechanism | Avoid adding a new recipient or transfer until its basis is known |
 
-Identity verification is normally a technical and risk decision. Choose the least intrusive method that gives enough confidence for the requested action. A valid RUT check digit is never proof of identity.
+A valid RUT check digit proves syntax only. It does not identify or authenticate the person.
 
-## Safe defaults
+## Retention defaults
 
-- Keep new optional processing off when its purpose or lawful basis is unknown
-- Keep draft notice text unpublished
-- Accept and track a rights request before identity or scope review is complete
-- Route uncertain exceptions and refusals to manual review
-- Run retention discovery and deletion in dry-run mode until the deletion preconditions are known
-- Preserve current production behavior when a new configuration value is missing
+Use an existing consumed retention value unless repository evidence marks it as a draft or placeholder. Otherwise:
 
-Add configuration only when runtime code reads it. Keep a missing value absent and validate it at the existing configuration boundary. Do not add placeholder records, generic policy objects, approval tables, or decision logs.
+1. Select a provisional period from the data's purpose and lifecycle
+2. Put the value in the existing runtime configuration system
+3. Record the assumption in the implementation response
+4. Add bounded selection, hold checks, dry run, outcome recording, and recovery appropriate to the deletion risk
+5. Do not keep destructive execution off solely because a legal or business value is missing unless the legal-blocker test passes
 
-Persist versions only when previous values affect behavior or evidence. Notices and consent records often need versions. Static contact configuration usually does not.
+An executor can still remain in dry-run mode for a confirmed engineering safety gap such as unbounded scope, missing hold checks, or no recovery path. Report that as a technical gap, not a legal blocker.
 
-## Developer-facing response
-
-Lead with the solution you selected:
-
-```text
-Recommended implementation: <repository-consistent design>
-Why: <current evidence and tradeoff>
-Runtime effect: <code, configuration, migration, or deployment change>
-Safe behavior now: <what can run immediately>
-Legal precondition, if any: <missing fact, cited rule, and exact disabled action>
-Owner: <business, privacy, or legal role that can supply the fact>
-Alternative: <include only when it has a material current tradeoff>
-```
-
-Do not return numbered legal placeholders, a blank questionnaire, or a request for a policy document.
+Do not invent one universal duration for core business records. Technical artifacts may use the short-lived defaults in `implementation-blueprint.md`.

@@ -1,6 +1,6 @@
 {
   "name": "chile-data-protection-api",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Build developer-ready Chilean personal-data API workflows with recommended defaults and functional runtime controls.",
   "author": {
     "name": "stratolark",
@@ -20,11 +20,11 @@
   "interface": {
     "displayName": "Chile Data Protection API",
     "shortDescription": "Engineer Chilean personal-data API workflows.",
-    "longDescription": "Audit, design, or implement Chilean personal-data API capabilities with recommended decisions, functional runtime controls, and selectable security postures. The skill does not create policy-document bundles by default. Legal source refresh is opt-in. This engineering aid does not provide legal advice or certify compliance.",
+    "longDescription": "Audit, design, or implement Chilean personal-data API capabilities with a technical-readiness verdict, exact runtime changes, practical defaults, and selectable security postures. Audit mode does not run project tests by default. Legal source refresh is opt-in. This engineering aid does not provide legal advice or certify compliance.",
     "developerName": "stratolark",
     "category": "Developer Tools",
     "capabilities": [],
     "websiteURL": "https://github.com/stratolark/chile-data-protection-api-skill",
-    "defaultPrompt": "Implement a repository-first Chilean personal-data API solution. Make technical decisions, block only law-bound production actions, and add focused tests."
+    "defaultPrompt": "Audit or implement a repository-first Chilean personal-data API solution. Give a technical-readiness verdict and exact routes, jobs, data changes, security controls, and tests."
   }
 }
