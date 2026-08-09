@@ -6,11 +6,15 @@ The skill covers RUT handling, privacy notices, consent, data-subject requests, 
 
 For audits and implementations, it keeps the applicable legal regime separate from the chosen engineering posture:
 
-- `LEGAL_BASELINE` implements verified legal requirements and the least-complex controls justified by actual risk.
-- `STRICT_ENGINEERING_DEFAULT` adds conservative identifier, encryption, lookup, telemetry, export, and abuse-resistance defaults.
-- `TAILORED_CONTROL_SET` applies the legal baseline plus an explicitly selected subset of strict controls.
+- **Legal baseline** implements verified legal requirements and the least-complex controls justified by actual risk.
+- **Strict security default** adds conservative identifier, encryption, lookup, telemetry, export, and abuse-resistance defaults.
+- **Tailored controls** applies the legal baseline plus a selected subset of strict controls.
 
-An audit with no posture specified reports legal gaps and strict-security recommendations separately. An implementation recommends strict mode while allowing the developer to choose baseline or a tailored control set.
+An audit with no posture specified reports legal gaps and strict-security recommendations separately. An implementation uses strict mode as the recommended default unless the user selects another posture.
+
+The skill gives developers a complete implementation path. It makes technical decisions from repository evidence and explains alternatives only when they change a current tradeoff. A production action stays disabled only when a cited law makes a missing fact a precondition for that action. Code, migrations, tests, runtime configuration, and dry runs can continue.
+
+The implementation is code-first. The skill does not create inventories, decision logs, gap reports, policy summaries, or documentation trees unless the user asks.
 
 Every posture keeps normal production engineering practices. Strict mode strengthens applicable controls. It does not automatically add microservices, queues, event sourcing, custom cryptography, or new dependencies. Recommendations must reuse the repository's established mechanisms. Each complex recommendation must address a current requirement or concrete risk.
 
@@ -19,11 +23,12 @@ Every posture keeps normal production engineering practices. Strict mode strengt
 
 ## Legal status
 
-The skill requires every invocation to verify the applicable legal regime from official sources.
+The skill uses its packaged legal baseline by default. It does not browse or refresh legal sources every time it loads.
 
 - Law No. 19.628 remains the current consolidated regime through November 30, 2026.
 - The principal amendments introduced by Law No. 21.719 are scheduled to enter into force on December 1, 2026.
-- Future amendments, regulations, Agency instructions, and sector-specific rules must be checked at execution time.
+- The user can request a source refresh when current legal research is needed.
+- If a deployment date falls outside the packaged baseline, the skill offers a refresh and continues reversible engineering work.
 
 ## Install from GitHub
 
@@ -77,10 +82,12 @@ $chile-data-protection-api Audit this API for Chilean personal-data engineering 
 Other examples:
 
 - Audit a NestJS, FastAPI, Go, .NET, or Rust API without changing files.
-- Compare `LEGAL_BASELINE` and `STRICT_ENGINEERING_DEFAULT` findings before choosing a remediation scope.
+- Compare legal-baseline and strict-security findings before choosing a remediation scope.
 - Design RUT storage and lookup without using RUT as a public identifier.
 - Implement access, rectification, erasure, objection, blocking, and portability workflows.
 - Review consent withdrawal, retention jobs, downstream deletion, or telemetry redaction.
+- Add validated runtime configuration only for privacy values that code consumes.
+- Continue technical work around missing legal facts and disable only law-bound production actions.
 
 The skill does not activate for generic CRUD, non-Chilean GDPR work, privacy-policy copywriting, or requests for a final legal opinion.
 
@@ -118,9 +125,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements and [SECURI
 
 Este proyecto contiene una habilidad instalable para auditar, diseñar e implementar capacidades técnicas de protección de datos personales en APIs con alcance chileno.
 
-No entrega asesoría legal ni certifica cumplimiento. La habilidad debe verificar en fuentes oficiales qué régimen legal está vigente, distinguir los requisitos actuales de la preparación para la reforma y marcar las decisiones jurídicas pendientes como `LEGAL_INPUT_REQUIRED`.
+No entrega asesoría legal ni certifica cumplimiento. La habilidad usa una base legal incluida y solo actualiza las fuentes cuando el usuario lo solicita.
 
-El equipo de desarrollo puede elegir entre una implementación de base legal, una postura de seguridad estricta o un conjunto de controles personalizado. La habilidad debe informar por separado las brechas legales y las recomendaciones estrictas.
+La habilidad recomienda una solución técnica y ofrece opciones concretas. Solo agrega configuración que el código usa. No crea registros de decisiones ni documentos de seguimiento por defecto.
+
+El equipo puede elegir una base legal, una postura de seguridad estricta o controles personalizados. Si no elige, la habilidad usa la postura estricta como supuesto recomendado.
 
 ## License
 

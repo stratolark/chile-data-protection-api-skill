@@ -14,6 +14,7 @@ PLUGIN_ROOT = ROOT / "plugins" / "chile-data-protection-api"
 SKILL_ROOT = PLUGIN_ROOT / "skills" / "chile-data-protection-api"
 SKILL_FILE = SKILL_ROOT / "SKILL.md"
 LEGAL_BASELINE = SKILL_ROOT / "references" / "legal-baseline.md"
+DEVELOPER_DECISION_GUIDE = SKILL_ROOT / "references" / "developer-decision-guide.md"
 OPENAI_YAML = SKILL_ROOT / "agents" / "openai.yaml"
 PLUGIN_JSON = PLUGIN_ROOT / ".codex-plugin" / "plugin.json"
 MARKETPLACE_JSON = ROOT / ".agents" / "plugins" / "marketplace.json"
@@ -37,16 +38,29 @@ EXPECTED_EVAL_IDS = {
     "strict-rut-security",
     "tailored-controls",
     "avoid-overengineering",
+    "default-no-source-refresh",
+    "explicit-source-refresh",
+    "missing-legal-facts",
+    "runtime-configuration-no-policy-files",
+    "narrow-production-blocker",
+    "technical-decisions-do-not-block",
+    "code-first-no-document-bundle",
+    "narrow-slice-no-scaffold",
+    "technical-concise-output",
 }
-REQUIRED_REGIMES = {
-    "CURRENT_LAW_THROUGH_2026_11_30",
-    "TRANSITION_PREPARATION_FOR_2026_REFORM",
-    "AMENDED_LAW_FROM_2026_12_01",
+REQUIRED_LEGAL_PERIODS = {
+    "Current law through 30 November 2026",
+    "Transition preparation for the reform",
+    "Amended law from 1 December 2026",
 }
 REQUIRED_POSTURES = {
-    "LEGAL_BASELINE",
-    "STRICT_ENGINEERING_DEFAULT",
-    "TAILORED_CONTROL_SET",
+    "Legal baseline",
+    "Strict security default",
+    "Tailored controls",
+}
+REQUIRED_SOURCE_BEHAVIOR = {
+    "Use the packaged legal baseline by default",
+    "current source research only when the user asks",
 }
 
 
@@ -95,11 +109,14 @@ def validate_skill(validation: Validation) -> None:
     validation.require(bool(fields.get("description")), "Skill description must not be empty")
     validation.require(len(text.splitlines()) <= 500, "SKILL.md exceeds 500 lines")
 
-    for regime in REQUIRED_REGIMES:
-        validation.require(regime in text, f"SKILL.md is missing legal regime {regime}")
+    for period in REQUIRED_LEGAL_PERIODS:
+        validation.require(period in text, f"SKILL.md is missing legal period {period}")
 
     for posture in REQUIRED_POSTURES:
         validation.require(posture in text, f"SKILL.md is missing engineering posture {posture}")
+
+    for source_behavior in REQUIRED_SOURCE_BEHAVIOR:
+        validation.require(source_behavior in text, f"SKILL.md is missing legal source behavior: {source_behavior}")
 
     for relative_reference in set(re.findall(r"references/[A-Za-z0-9_.-]+\.md", text)):
         validation.require((SKILL_ROOT / relative_reference).is_file(), f"Missing reference {relative_reference}")
@@ -112,6 +129,24 @@ def validate_skill(validation: Validation) -> None:
     for phrase in safety_phrases:
         validation.require(phrase in text, f"SKILL.md is missing safety boundary: {phrase}")
 
+    developer_phrases = (
+        "Start with the implementation you recommend",
+        "Make technical decisions from repository evidence",
+        "Do not wait for legal approval of route names",
+        "legal-blocker test",
+        "Disable a production action only when",
+        "Add configuration only when runtime code consumes it",
+        "Do not create a generic privacy policy object",
+        "Keep the trace in working analysis",
+        "Do not scaffold unrelated rights",
+        "without inventing paths, headers, schemas, tables, or identifier formats",
+        "Do not copy legal source lists or research notes into the repository",
+        "Do not repeat the packaged legal background",
+        "Do not repeat blocker text",
+    )
+    for phrase in developer_phrases:
+        validation.require(phrase in text, f"SKILL.md is missing developer workflow: {phrase}")
+
 
 def validate_legal_baseline(validation: Validation) -> None:
     validation.require(LEGAL_BASELINE.is_file(), "Missing legal baseline")
@@ -120,10 +155,57 @@ def validate_legal_baseline(validation: Validation) -> None:
 
     text = LEGAL_BASELINE.read_text(encoding="utf-8")
     validation.require("Last verified: 2026-08-09" in text, "Legal baseline verification date is missing")
-    for regime in REQUIRED_REGIMES:
-        validation.require(regime in text, f"Legal baseline is missing legal regime {regime}")
-    for label in ("LAW", "STANDARD_ENGINEERING_PRACTICE", "RISK_BASED_CONTROL", "STRICT_DEFAULT", "ENGINEERING_RECOMMENDATION", "LEGAL_INPUT_REQUIRED"):
-        validation.require(label in text, f"Legal baseline is missing source label {label}")
+    for period in REQUIRED_LEGAL_PERIODS:
+        validation.require(period in text, f"Legal baseline is missing legal period {period}")
+    for phrase in (
+        "legal-blocker test",
+        "standard engineering practice",
+        "risk-based control",
+        "stricter security choice",
+        "unresolved legal fact",
+    ):
+        validation.require(phrase in text, f"Legal baseline is missing plain-language distinction: {phrase}")
+
+
+def validate_developer_decision_guide(validation: Validation) -> None:
+    validation.require(DEVELOPER_DECISION_GUIDE.is_file(), "Missing developer decision guide")
+    if not DEVELOPER_DECISION_GUIDE.is_file():
+        return
+
+    text = DEVELOPER_DECISION_GUIDE.read_text(encoding="utf-8")
+    for phrase in (
+        "Separate facts from design choices",
+        "Legal-blocker test",
+        "Keep a production action disabled only when all four statements are true",
+        "Technical solution the skill must provide",
+        "Safe defaults",
+        "Recommended implementation",
+        "Do not return numbered legal placeholders",
+    ):
+        validation.require(phrase in text, f"Developer decision guide is missing: {phrase}")
+
+    forbidden_artifacts = (
+        "docs/privacy/data-processing-inventory.md",
+        "docs/privacy/privacy-implementation-decisions.md",
+        "docs/privacy/privacy-gap-report.md",
+    )
+    all_skill_text = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in SKILL_ROOT.rglob("*")
+        if path.is_file() and path.suffix.lower() in {".md", ".yaml", ".yml"}
+    )
+    for artifact in forbidden_artifacts:
+        validation.require(artifact not in all_skill_text, f"Skill still recommends generated artifact: {artifact}")
+
+    forbidden_internal_terms = {
+        "numbered legal placeholder": re.compile(r"\b(?:LEGAL|GATE)-\d{3}\b"),
+        "legal-input marker": re.compile(r"\bLEGAL_INPUT_REQUIRED\b"),
+        "law-gap marker": re.compile(r"\bLAW_GAP\b"),
+        "strict-gap marker": re.compile(r"\bSTRICT_DEFAULT_GAP\b"),
+        "enum-style posture": re.compile(r"\b(?:LEGAL_BASELINE|STRICT_ENGINEERING_DEFAULT|TAILORED_CONTROL_SET)\b"),
+    }
+    for label, pattern in forbidden_internal_terms.items():
+        validation.require(pattern.search(all_skill_text) is None, f"Skill still contains {label}")
 
 
 def validate_plugin(validation: Validation) -> None:
@@ -250,6 +332,7 @@ def main() -> int:
     validation = Validation()
     validate_skill(validation)
     validate_legal_baseline(validation)
+    validate_developer_decision_guide(validation)
     validate_plugin(validation)
     validate_marketplace(validation)
     validate_openai_yaml(validation)

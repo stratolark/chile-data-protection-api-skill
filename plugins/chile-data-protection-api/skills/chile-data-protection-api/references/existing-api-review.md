@@ -20,6 +20,7 @@ Identify:
 - Persistence technologies and migration tooling
 - Authentication, sessions, service accounts, and tenant isolation
 - Validation, serialization, and error conventions
+- Configuration loading, validation, ownership, and environment overrides
 - Jobs, queues, schedulers, events, consumers, and dead letters
 - Caches, search, object storage, analytics, warehouses, and exports
 - External processors and recipients
@@ -62,9 +63,11 @@ Determine:
 - Whether the platform is controller or processor for each tenant
 - Whether a request spans one tenant, several tenants, or the platform itself
 - Whether subject identifiers are globally unique or tenant-scoped
-- Which admin roles may view or process each request
+- Which admin roles can view or process each request
 
-Mark unclear contractual allocation `LEGAL_INPUT_REQUIRED`.
+Describe unclear contractual allocation as a missing legal or business fact.
+
+Infer the technical scope from repository evidence. Use `references/developer-decision-guide.md` only if the unresolved role affects the requested production behavior.
 
 ## Existing capability search
 
@@ -88,29 +91,23 @@ Reuse reliable capabilities rather than building duplicates.
 
 Apply the simplicity gate before recommending a new privacy service, adapter layer, queue, event model, dependency, or cryptographic subsystem. Identify the current requirement, existing repository pattern, operational cost, and the smallest complete alternative.
 
-## Gap matrix
+## Findings
 
-For each gap, provide:
+For each confirmed gap, return:
 
 ```text
-id
-requirement_or_capability
-classification
-engineering_posture
+title
+basis_when_material
+file_or_symbol_evidence
 current_behavior
-evidence
-affected_data_and_users
 risk
-recommended_change
-existing_project_pattern
-smallest_complete_change
-complexity_and_operational_cost
-files_or_components
-dependency
-legal_input_needed
-test_needed
+smallest_code_change
+test
+missing_law_bound_fact
 priority
 ```
+
+Keep findings in the response. Do not create a gap file unless the user asks.
 
 Suggested priority scale:
 
@@ -119,7 +116,7 @@ Suggested priority scale:
 - `P2`: incomplete propagation, weak auditability, brittle operations, or significant documentation gap
 - `P3`: hardening, maintainability, or lower-risk completeness improvement
 
-Do not inflate priority solely because an endpoint name differs from the illustrative blueprint. Do not assign legal impact to a missing `STRICT_DEFAULT`. Report its security benefit and implementation cost separately.
+Do not inflate priority solely because an endpoint name differs from the illustrative blueprint. Do not assign legal impact to a missing stricter security control. Report its security benefit and implementation cost separately.
 
 ## Migration review
 
@@ -127,8 +124,8 @@ When existing records contain RUT or other personal data, select the migration c
 
 - Identify plaintext columns, indexes, foreign keys, cache keys, and downstream copies
 - Under every posture, identify applicable legal duties, material risks, and existing stronger controls
-- Under `STRICT_ENGINEERING_DEFAULT`, design surrogate identifiers and add encrypted value, keyed lookup when exact lookup is required, and key-version fields
-- Under `LEGAL_BASELINE`, select the least-complex adequate storage and lookup controls from the actual threat model. Do not claim that omitted strict controls are universally unnecessary
+- Under the strict security default, design surrogate identifiers and add encrypted values, keyed lookup when exact lookup is required, and key-version fields
+- Under the legal baseline, select the least-complex adequate storage and lookup controls from the actual threat model. Do not claim that omitted strict controls are universally unnecessary
 - Backfill in bounded, resumable batches
 - Avoid printing personal data in migration logs
 - Use dual read or dual write where zero-downtime rollout requires it
@@ -171,13 +168,11 @@ Inspect:
 Return:
 
 1. Scope and detected architecture
-2. Legal-verification status and engineering posture. Use dual-track findings when no posture was selected
-3. Controller and processor assumptions
-4. Processing inventory summary
-5. Confirmed findings with evidence, separating `LAW_GAP` from `STRICT_DEFAULT_GAP`
-6. Unknowns and `LEGAL_INPUT_REQUIRED` decisions
-7. Prioritized remediation sequence
-8. Proposed code areas and tests
-9. Operational and migration risks
+2. Packaged baseline date, applicable legal period, and security posture
+3. Confirmed findings with exact evidence, separating legal gaps from stricter security recommendations
+4. The smallest code change and tests for each finding
+5. Any law-bound fact that disables a production action, with the cited rule and narrow effect
+
+Lead with the recommended implementation path. Make technical decisions from repository evidence. Do not return blank legal forms or repeat the same blocker.
 
 Do not modify files in audit-only mode.

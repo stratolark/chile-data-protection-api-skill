@@ -1,258 +1,169 @@
-# Security, testing, and definition of done
+# Security and verification
 
-Use this reference before finalizing any audit or implementation. Apply checks according to the selected posture in `references/engineering-postures.md`. Never weaken existing stronger controls.
+Apply only the sections relevant to the changed behavior. Preserve existing stronger controls.
 
-## Contents
+## Access control
 
-- Authentication, exports, telemetry, and abuse resistance
-- Unit, integration, security, contract, and migration tests
-- Operational and documentation checks
-- Prohibited shortcuts and definition of done
+- Map the authenticated principal to the repository's stable subject identity
+- Use a non-RUT opaque public identifier under the strict security default
+- Enforce object ownership, role, and tenant scope in the service that owns the action
+- Test cross-user, cross-role, and cross-tenant denial
+- Use step-up authentication when the current action has high disclosure or takeover impact
+- Give service accounts access only to the stores and operations they need
+- Support former users or representatives only when the requested flow requires them
 
-## Authentication and authorization
+Do not treat RUT, name, email, phone, or a valid check digit as authentication.
 
-- Map an authenticated principal to a stable subject identifier. Use a non-RUT opaque identifier under `STRICT_ENGINEERING_DEFAULT`
-- Prevent IDOR across privacy requests, artifacts, decisions, and admin actions
-- Test cross-tenant isolation
-- Use step-up authentication for high-risk result delivery and changes
-- Support former users without forcing account recreation
-- Support representatives through an approved verification workflow
-- Restrict service accounts to necessary stores and operations
-- Require MFA for privileged privacy operations where supported
-- Use separation of duties when organizational risk requires it
+## Exports
 
-## Export security
+- Protect stored artifacts according to their exposure and lifetime
+- Under the strict security default, encrypt personal-data artifacts at rest
+- Use short-lived authenticated retrieval
+- Keep personal data out of filenames, object names, URLs, and access tokens
+- Set safe cache and download headers
+- Remove artifacts under the configured retention rule
+- Record success and failure without logging contents
 
-- Generate asynchronously when nontrivial
-- Encrypt at rest under `STRICT_ENGINEERING_DEFAULT`. Under `LEGAL_BASELINE`, select equivalent storage protection from the artifact's sensitivity, exposure, and lifetime
-- Use short-lived authenticated or signed retrieval
-- Use safe filenames without RUT, email, or name
-- Set cache-control and content-disposition correctly
-- Expire and remove artifacts under an approved rule
-- Avoid ordinary email attachments containing personal data
-- Record retrieval success and failure without logging contents
-- Prevent token reuse when one-time retrieval is required
+Generate asynchronously only when result size or downstream latency makes a request-bound response unsafe.
 
-## Telemetry and redaction
+## Telemetry
 
-Inspect and test:
+Inspect logs, access logs, exceptions, traces, metrics, audit events, queue inspection, dead letters, APM, and analytics touched by the changed path.
 
-- Application logs
-- Reverse-proxy and load-balancer logs
-- Framework access logs
-- Exceptions and crash reports
-- Distributed traces
-- Metrics labels
-- Audit events
-- Queue payload inspection
-- Dead-letter queues
-- APM and analytics
+Keep raw RUT, names, emails, phones, addresses, identity evidence, request content, and export data out of telemetry unless a specific operational need and proportionate protection justify the field.
 
-Define the purpose, approved fields, access, and retention for telemetry. Reject raw RUT, names, emails, phones, addresses, identity evidence, consent evidence, request content, and export data unless a documented operational need and reviewed protection justify the specific field.
+Never use personal values as metric labels. Under the strict security default, capture actual test telemetry and assert that raw personal values are absent. Permit an exception only when the user provides a current operational need and the design bounds access and retention.
 
-Do not use personal values as metric labels. Under `STRICT_ENGINEERING_DEFAULT`, capture actual test telemetry and assert that raw personal values are absent unless an explicit reviewed exception exists. Under `LEGAL_BASELINE`, assert that unapproved or unnecessary personal values are absent and that approved values meet their access, security, and retention rules.
+## Input and abuse resistance
 
-## Abuse resistance
+Apply the controls relevant to the endpoint:
 
-- Rate-limit registration, recovery, verification, lookup, rights request, and export operations
+- Validate shape, size, type, and tenant scope at entry
+- Rate-limit registration, recovery, verification, lookup, request, and export operations when abuse is credible
 - Use generic responses when details enable enumeration
-- Use idempotency for retry-prone request creation and administrative actions
-- Limit evidence file type, size, lifetime, and access
-- Apply the application's malware-scanning policy to uploads
-- Protect direct-transfer connectors against SSRF, DNS rebinding, open redirects, and data exfiltration
-- Validate content type and safe archive extraction
+- Use idempotency for retry-prone writes
+- Bound uploaded evidence by type, size, lifetime, and access
+- Apply the application's malware checks to uploads when available
+- Protect direct-transfer destinations against SSRF, DNS rebinding, redirects, and exfiltration
+- Extract archives with path, size, and file-count limits
 
-## Unit tests
+## Behavior tests
 
-Cover the applicable controls for the selected posture, including:
+Test the changed slice, not the whole privacy domain.
+
+Always include:
+
+- Successful authorized behavior
+- Unauthenticated and unauthorized denial
+- Cross-tenant denial when the application is multi-tenant
+- Invalid and boundary input
+- Missing runtime configuration and its exact safe failure
+- Retry or duplicate behavior when the boundary can repeat work
+- Telemetry assertions for personal-data exposure
+
+Add only the cases that match the feature:
 
 - RUT normalization and valid or invalid check digits
-- Keyed lookup and key-version behavior when that strict or risk-based design is selected
-- Deadline calculation across month boundaries, daylight-saving changes, weekends, and Chilean holidays
-- State transitions and invalid transitions
-- One-extension limit
-- Purpose-scoped consent and objection
-- Block-policy decisions
-- Retention and legal holds
-- Telemetry allowlisting or redaction helpers
-- Artifact-expiry decisions
-
-## Integration and end-to-end tests
-
-Cover at least:
-
-- Registration without optional consent
 - Notice version presentation
-- Consent grant and withdrawal propagation
-- Access request from an active user
-- Request from a former user
-- Representative workflow when supported
-- Rectification with cache and index propagation
-- Full erasure
-- Partial erasure because of an approved legal hold
-- Temporary blocking enforced in an API request
-- Temporary blocking enforced in a worker or consumer
-- Objection stopping direct marketing
-- Portability artifact generation, retrieval, expiry, and cleanup
-- Retry and dead-letter behavior for processor failure
-- Duplicate request submission and idempotency
-- Overdue request monitoring
-- Correction or erasure propagation acknowledgements
+- Purpose-scoped consent grant and withdrawal
+- Authenticated or recovery-path rights request
+- Representative authority review
+- Deadline calculations across month, timezone, and Chilean holiday boundaries
+- Rectification through authoritative and derived stores
+- Full and partial erasure
+- Blocking or objection in synchronous and background paths
+- Export generation, retrieval, expiry, and cleanup
+- Processor failure, retry, and visible final outcome
+- Retention eligibility, hold checks, dry run, and bounded deletion
+- Backup restore or stale-event behavior after erasure
 
-## Security tests
-
-Cover at least:
-
-- IDOR between users
-- Cross-tenant access
-- Privilege escalation into admin operations
-- Enumeration through registration and verification responses
-- Unapproved raw RUT or other personal data in logs, traces, metrics, URLs, tokens, filenames, and errors. In strict mode, test for absence unless a reviewed exception exists
-- Export retrieval after expiration
-- Reuse of an export credential
-- SSRF through a portability destination
-- Unauthorized block release or override
-- Background processing continuing after consent withdrawal or objection
-- Restore of erased data from a backup fixture without tombstone replay
-- Stale event recreating an erased subject
+Do not build a capability merely to satisfy a checklist item.
 
 ## Contract and migration tests
 
-- Update OpenAPI, GraphQL, RPC, AsyncAPI, or event schemas
-- Validate backward compatibility where required
-- Test migrations on representative existing data
-- Test backfill resumability and idempotency
+When the change affects a public contract or stored data:
+
+- Update the checked-in API or event contract
+- Verify required backward compatibility
+- Test migrations with representative existing data
+- Test backfill resumability and idempotency when a backfill exists
 - Verify rollback or recovery behavior
-- Verify safe failure when encryption or HMAC keys are part of the selected design and are missing
-- Verify no plaintext personal data appears in migration logs
-- Verify tenant-scoped uniqueness and lookup behavior when required by the data model
+- Keep personal values out of migration logs
+- Verify tenant-scoped uniqueness and lookup behavior when required
+- Verify safe startup or feature failure when selected encryption or lookup keys are absent
 
 ## Operational checks
 
-Confirm:
+Check only the machinery introduced or changed by the slice:
 
-- Overdue requests produce alerts
 - Failed propagation is visible and retryable
-- Dead letters have an owner and runbook
-- Retention jobs are monitored
-- Backup restoration replays erasure tombstones
-- Key rotation has a documented procedure
-- Export cleanup is scheduled and observed
-- Incident reporting is configurable
-- Processor deletion acknowledgements can be tracked
-- Administrative access is periodically reviewable
+- Dead letters have an existing owner and recovery path
+- Scheduled work is monitored
+- Export cleanup runs and reports failure
+- Backup restoration preserves erasure when relevant
+- Selected key protection has a rotation and recovery path
+- New operator actions have authorization and an existing or updated runbook
 
-## Documentation checks
+Do not create a runbook for code with no operator action or recovery procedure.
 
-Document:
-
-- Legal-verification date and sources
-- Controller or processor assumptions
-- Data-processing inventory
-- Purpose and lawful-basis placeholders or approvals
-- Retention and legal-hold decisions
-- API and event contracts
-- Identity-verification strategies
-- Deadline rules and calendar source
-- Encryption and key configuration without exposing secrets
-- RUT migration and rotation
-- Rights-request operations
-- Backup restoration and erasure replay
-- Incident and processor propagation runbooks
-- Remaining `LEGAL_INPUT_REQUIRED` items
-
-## Prohibited shortcuts in every posture
+## Prohibited shortcuts
 
 Do not:
 
-- Add only `DELETE /me` and call erasure complete
-- Add controllers without tracing downstream data
-- Treat RUT, name, email, or phone as authentication by itself
-- Describe a strict engineering default as an exact statutory requirement
-- Remove or weaken an existing stronger control merely because baseline mode is selected
-- Let clients choose a lawful basis
+- Add only account deletion and call legal erasure complete
+- Add a controller without tracing the stores changed by its behavior
+- Let a client choose a lawful basis
 - Treat a displayed notice as consent
 - Bundle optional consent into required terms
-- Hard-code Monday through Friday as the complete business-day calendar
-- Hard-code an unverified Agency endpoint or payload
-- Import GDPR's 72-hour breach deadline as Chilean law
+- Hard-code Monday through Friday as a Chilean business-day calendar
+- Import the GDPR 72-hour incident deadline as Chilean law
 - Email ordinary personal-data export attachments
-- Post exports to arbitrary user URLs
-- Keep identity evidence permanently by default
-- Ignore former users or representatives
-- Treat encryption alone as a privacy implementation
-- Ignore processors, caches, search, queues, analytics, logs, replicas, or backups
-- Delete data under a legal hold without an approved decision
-- Hide uncertainty behind confident wording
+- Send exports to arbitrary user URLs
+- Keep identity evidence indefinitely by default
+- Describe encryption alone as a privacy implementation
+- Ignore current processors, caches, search, queues, analytics, logs, replicas, or backups
+- Delete data while an applicable legal hold is unresolved
+- Stop reversible implementation because a non-technical value is missing
+- Publish placeholder controller details or draft notice text
+- Enable new optional processing without its purpose and lawful basis
+- Run destructive retention while a law-bound deletion precondition is missing
+- Automatically refuse a request without an established legal ground
 
-## Strict-posture prohibitions
-
-Under `STRICT_ENGINEERING_DEFAULT`, do not:
+Under the strict security default, also do not:
 
 - Use natural-person RUT as a primary key or public identifier
-- Put raw natural-person RUT in routes, bearer tokens, client-visible sessions, logs, metrics, traces, analytics, filenames, object names, queue names, cache keys, partition keys, or idempotency keys
+- Put raw natural-person RUT in routes, tokens, sessions, logs, metrics, traces, analytics, filenames, object names, queue names, cache keys, partition keys, or idempotency keys
 - Use an unkeyed hash for exact RUT lookup
-- Store recoverable RUT without the selected field or equivalent protection and key-management design
+- Store recoverable RUT without the selected protection and key-management design
 
-## Definition of done for every posture
+## Done
 
-Do not call the work complete until every applicable item is true:
+The changed slice is done when:
 
-- The existing API was reviewed or the greenfield architecture was stated
-- The responsibility and tenant model is documented or marked `LEGAL_INPUT_REQUIRED`
-- The processing inventory covers all known stores, queues, processors, exports, telemetry, and backups
-- Identifier handling matches the selected posture and approved exceptions
-- Notice presentation, contract acceptance, and optional consent are separate
-- Privacy requests have durable intake, verification, deadline, decision, execution, result, and audit behavior
-- Access, rectification, erasure, objection, blocking, and portability are implemented or explicitly not applicable with approved reasoning
-- Account closure is separate from erasure
-- Blocking is enforced in APIs and background systems
-- Erasure covers downstream systems and backup restoration
-- Consent withdrawal and objection propagate to future processing
-- Exports are authenticated, short-lived, and removed safely
-- Admin operations are authorized and audited
-- Incident reporting uses a configurable adapter
-- Tested telemetry contains no unapproved or unnecessary raw personal data
-- API or event contracts are updated
-- Migrations and backfills are safe and documented
-- Relevant tests pass, or failures and unrun tests are reported exactly
-- Operational runbooks exist
-- Legal assumptions remain visible
-- The final report does not claim or guarantee compliance
+- Authorization, tenant scope, and input validation are enforced
+- Every affected current store, job, vendor, telemetry path, export, and backup path has correct behavior
+- Any missing law-bound value fails safely at the exact dependent action
+- Runtime configuration is consumed, validated, and tested
+- Migrations and backfills have a recovery path
+- Changed contracts match the implementation
+- Relevant tests pass, or the final response reports failures and unrun tests
+- New operator actions and failure modes use an existing runbook or a focused update
+- The final response states assumptions and any narrow legal production precondition
+- The final response does not claim or guarantee compliance
 
-For `LEGAL_BASELINE`, also confirm:
+For the legal baseline, confirm that the result uses established repository architecture and that omitted stricter controls are not reported as legal failures.
 
-- Every implemented control is labeled `LAW`, `STANDARD_ENGINEERING_PRACTICE`, or `RISK_BASED_CONTROL`
-- The result follows established repository architecture and avoids speculative subsystems, dependencies, and abstractions
-- Omitted strict controls are not reported as legal failures and have an evidence-backed risk rationale when material
-- Legal or security owners are identified for unresolved decisions and residual risk without inventing approval
+For the strict security default, confirm that each applicable identifier, storage, lookup, telemetry, export, and enumeration control is implemented and tested. Report skipped controls only when they affect the changed slice.
 
-For `STRICT_ENGINEERING_DEFAULT`, also confirm:
+For tailored controls, state the selected controls and current tradeoffs in the response. Do not create a control log.
 
-- Applicable `STRICT_DEFAULT` identifier, encryption, lookup, telemetry, export, and enumeration controls are implemented and tested
-- Skipped strict controls are recorded as not applicable with evidence
-- New operational machinery passes the simplicity gate and has an identified owner, failure mode, and test
-
-For `TAILORED_CONTROL_SET`, also confirm:
-
-- Selected and rejected strict controls, tradeoffs, owner, and review date are recorded
-
-## Final implementation report
+## Final report
 
 Return:
 
-1. Scope, mode, and engineering posture
-2. Legal verification status
-3. Architecture and data-flow decisions
-4. Files and symbols changed
-5. Migrations and backfill behavior
-6. Endpoints or equivalent operations
-7. Jobs, events, processors, and adapters
-8. Security controls
-9. Tests added
-10. Exact commands run and results
-11. Deployment, keys, configuration, and rollout
-12. Remaining limitations and `LEGAL_INPUT_REQUIRED` decisions
-13. Strict controls applied, skipped, or deferred
+1. Implemented behavior and exact files changed
+2. Runtime configuration, migrations, and rollout impact
+3. Tests run and exact results
+4. Any remaining law-bound action, its cited rule, and the missing fact owner
 
-Never state that tests passed when they were not run. Never hide a partial implementation behind a general statement of completion.
+Never state that tests passed when they were not run. Never hide a partial implementation behind a general completion claim.

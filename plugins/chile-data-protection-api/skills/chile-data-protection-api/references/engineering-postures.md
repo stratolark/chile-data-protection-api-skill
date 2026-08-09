@@ -1,11 +1,11 @@
 # Engineering postures
 
-Use this reference for every audit, design, or implementation. Select the legal operating regime first, then select an engineering posture independently.
+Use this reference for every audit, design, or implementation. Select the applicable legal period first, then select a security posture independently.
 
 ## Contents
 
 - Posture selection
-- Control labels
+- Recommendation basis
 - Simplicity and standard-practice gate
 - Legal baseline posture
 - Strict engineering posture
@@ -15,24 +15,30 @@ Use this reference for every audit, design, or implementation. Select the legal 
 
 ## Select one posture
 
-- `LEGAL_BASELINE`: Implement verified legal requirements for the selected regime and the least-complex technical and organizational controls justified by the actual risks. This is not a low-security mode and does not certify compliance.
-- `STRICT_ENGINEERING_DEFAULT`: Apply `LEGAL_BASELINE` plus conservative security and privacy defaults. This is the recommended posture for a new system that processes natural-person RUT or other high-impact identifiers.
-- `TAILORED_CONTROL_SET`: Apply `LEGAL_BASELINE` plus an explicit, documented subset of strict controls selected from the threat model and operational constraints.
+- **Legal baseline**: Implement verified legal requirements for the selected period and the least-complex technical and organizational controls justified by actual risk. This is not a low-security mode and does not certify compliance.
+- **Strict security default**: Apply the legal baseline plus conservative security and privacy defaults. Recommend this posture for a new system that processes natural-person RUT or other high-impact identifiers.
+- **Tailored controls**: Apply the legal baseline plus a selected subset of stricter controls supported by the threat model and operational constraints.
 
-The posture does not decide the purpose, lawful basis, necessity, retention period, legal hold, controller role, or statutory exception. Mark unresolved decisions `LEGAL_INPUT_REQUIRED`.
+The posture does not decide the purpose, lawful basis, necessity, retention period, legal hold, controller role, or statutory exception. Describe an unresolved item by its domain name, such as `retention period`, instead of assigning an internal code.
 
-Never remove or weaken an existing stronger control merely because `LEGAL_BASELINE` is selected. Treat removal as a separate security change requiring evidence and user authorization.
+Do not stop implementation for every unresolved fact. Use `references/developer-decision-guide.md` to select a reversible path and apply the legal-blocker test.
 
-## Label every finding and control
+Never remove or weaken an existing stronger control merely because the legal baseline is selected. Treat removal as a separate security change requiring evidence and user authorization.
 
-- `LAW`: Source-backed legal requirement under the selected operating regime. Cite the official provision.
-- `STANDARD_ENGINEERING_PRACTICE`: Repository-consistent validation, authorization, testing, migration, error handling, observability, or maintainability work needed for a correct production system, without claiming that the law prescribes its exact form.
-- `RISK_BASED_CONTROL`: Technical or organizational measure selected to satisfy a risk-based legal or security duty. Record the risk and why the control is adequate.
-- `STRICT_DEFAULT`: Conservative engineering control that is not prescribed in that exact form by law.
-- `LEGAL_INPUT_REQUIRED`: Legal, contractual, or policy decision that cannot be resolved from code.
-- `ASSUMPTION`: Reversible implementation assumption made to continue work.
+## Explain the basis only when it matters
 
-Do not report a missing `STRICT_DEFAULT` as legal noncompliance. Do not treat `LEGAL_BASELINE` as permission to omit standard software practices or controls needed for authentication, authorization, tenant isolation, confidentiality, integrity, availability, or an identified material risk.
+Use plain language to distinguish:
+
+- A legal requirement tied to a cited provision and applicable period
+- Standard engineering practice needed for a correct production system
+- A risk-based control selected for an identified threat or legal duty
+- A stricter security choice that the law does not prescribe in that exact form
+- A missing legal or business fact that code cannot establish
+- A reversible implementation assumption
+
+Do not add a classification tag to every finding. State the basis where the distinction changes priority, scope, or the user's understanding.
+
+Do not report a missing stricter control as legal noncompliance. The legal baseline never permits omission of authentication, authorization, tenant isolation, confidentiality, integrity, availability, or controls needed for an identified material risk.
 
 ## Simplicity and standard-practice gate
 
@@ -49,37 +55,28 @@ Before recommending or adding a table, service, worker, queue, event stream, sta
 
 Preserve input validation, authorization, data integrity, transaction safety, required idempotency, error handling, rollback, compatibility, operational diagnostics, and behavior-focused tests. Do not call their removal “simplification.”
 
-For each nontrivial recommendation, record:
-
-```text
-requirement_or_risk
-existing_project_pattern
-smallest_complete_control
-complexity_and_operational_cost
-why_simpler_is_insufficient
-conditions_for_later_expansion
-```
+For a nontrivial recommendation, name the current requirement or risk, the repository pattern reused, the smallest complete control, and its operational cost. Add expansion criteria only when a known near-term change requires them.
 
 If no present requirement or proportionate safety benefit justifies a mechanism, do not recommend it.
 
-## `LEGAL_BASELINE`
+## Legal baseline
 
 Implement only:
 
-1. Applicable `LAW` requirements for the verified regime
-2. `STANDARD_ENGINEERING_PRACTICE` controls consistent with the repository and deployment model
-3. `RISK_BASED_CONTROL` measures supported by the system's data flows, threat model, sector, and operational context
+1. Applicable legal requirements for the verified period
+2. Standard engineering controls consistent with the repository and deployment model
+3. Risk-based measures supported by the system's data flows, threat model, sector, and operational context
 4. Existing repository security requirements and stronger controls already in place
 
-Prefer the smallest durable design. Document rejected strict controls and why they are unnecessary or disproportionate for the current risk. Require legal or privacy approval for legal conclusions and the security owner for material residual risk.
+Prefer the smallest durable design. Explain a rejected strict control only when it affects the current request. Legal or privacy owners supply legal conclusions. The security owner accepts material residual risk under the organization's normal process.
 
 Examples:
 
 - The law requires appropriate security or due diligence. It does not universally require application-level field encryption.
-- A stable surrogate database key may be enough internally. A UUID is not legally required.
-- Personal data can appear in approved operational records when necessary. Apply access controls, an approved retention period, and suitable protection. Do not copy it into telemetry without a defined purpose.
+- A stable surrogate database key can be sufficient internally. A UUID is not legally required.
+- Personal data can appear in necessary operational records. Apply access controls, the applicable retention rule, and suitable protection. Do not copy it into telemetry without a defined purpose.
 
-## `STRICT_ENGINEERING_DEFAULT`
+## Strict security default
 
 Apply all applicable baseline controls and these defaults unless a control is technically irrelevant or conflicts with a verified legal obligation:
 
@@ -97,26 +94,15 @@ Strict mode is not permission to add unused cryptography, duplicate identifiers,
 
 Reuse the host platform's proven encryption, secret-management, authentication, authorization, validation, migration, job, telemetry, and testing capabilities before adding dependencies or parallel frameworks. Never invent cryptographic primitives. Do not create a privacy microservice, generic adapter framework, queue, outbox, or event-sourced model unless a present boundary or failure mode requires it.
 
-## `TAILORED_CONTROL_SET`
+## Tailored controls
 
-Record:
-
-```text
-baseline_controls
-selected_strict_controls
-rejected_strict_controls
-risk_and_tradeoff
-approver_or_owner
-review_date
-```
-
-Do not invent an approval. Mark it `LEGAL_INPUT_REQUIRED` or `ASSUMPTION` as appropriate until the responsible owner decides.
+Implement the legal baseline plus the stricter controls selected by the user or supported by the current threat model. State the selected controls and their current tradeoff. Mention an omitted strict control only when it materially affects the requested slice.
 
 ## Identifier and RUT controls
 
 Treat classification and implementation separately.
 
-| Concern | `LEGAL_BASELINE` | `STRICT_ENGINEERING_DEFAULT` |
+| Concern | Legal baseline | Strict security default |
 | --- | --- | --- |
 | Natural-person RUT/RUN | Treat as personal data and justify collection, use, disclosure, retention, and security | Baseline plus surrogate identity, field protection, and exclusion from public or telemetry identifiers |
 | Company RUT | Do not classify it as personal data solely because it identifies a legal entity. Check whether the record also concerns a natural person | Do not use it as a security credential. Protect it according to business and sector risk |
@@ -128,19 +114,29 @@ Treat classification and implementation separately.
 | Public identifiers | Enforce authorization regardless of identifier shape | Do not expose natural-person RUT. Prefer opaque non-enumerable identifiers |
 | Telemetry | Define purpose, fields, access, retention, and redaction. Reject unjustified raw personal data | Assert that raw personal data is absent unless an explicit reviewed exception exists |
 
-RUT, name, email, phone, and address are not sensitive data merely by category. Context or combination can reveal sensitive information or create high impact, so risk classification may be higher than the statutory category suggests.
+RUT, name, email, phone, and address are not sensitive data merely by category. Context or combination can reveal sensitive information or create high impact. As a result, the risk classification can be higher than the statutory category suggests.
 
 ## Audit behavior
 
 If the user does not select a posture, produce a dual-track audit:
 
-1. `LAW_GAP` and required risk controls
-2. `STRICT_DEFAULT_GAP` recommendations with cost and benefit
+1. Legal gaps and required risk controls
+2. Stricter security recommendations with cost and benefit
 
 Keep legal impact and strict-security impact in separate fields. Do not ask a blocking posture question when both tracks can be reported.
 
 ## Implementation behavior
 
-If the user selects a posture, implement it. If no posture is selected, recommend `STRICT_ENGINEERING_DEFAULT` and ask only when interaction is practical. When work must continue without an answer, use `STRICT_ENGINEERING_DEFAULT` as an `ASSUMPTION` because it preserves the skill's safer historical behavior.
+If the user selects a posture, implement it. If no posture is selected, recommend the strict security default as a reversible implementation assumption.
 
-Before editing, record the selected posture and applicable controls. After editing, report each strict control that was applied, skipped, or deferred. In `LEGAL_BASELINE`, explain why an omitted strict control does not address the identified risk. Do not claim that it is legally unnecessary in every context.
+Do not pause only to ask which posture to use. Ask only when the choice creates a material cost, migration, compatibility, or operational tradeoff.
+
+When a choice is necessary, provide at most three options. Recommend one option from repository evidence and state the cost of each option.
+
+Before editing, select the posture and applicable controls in working analysis. After editing, report strict controls only when they changed the requested slice. Under the legal baseline, explain a material omitted strict control through the identified risk. Do not claim that it is legally unnecessary in every context.
+
+Add runtime configuration only for values that code consumes. Use the repository's existing configuration mechanism.
+
+Do not create a generic privacy configuration object, approval workflow, or decision log. Keep missing values absent and fail safely at the dependent action.
+
+When a legal or business fact is missing, implement draft states and safe failure behavior. Disable a production action only when the legal-blocker test passes.

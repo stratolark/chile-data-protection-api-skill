@@ -1,6 +1,6 @@
 # Legal and product baseline
 
-Use this reference for legal scoping and the minimum product capabilities. Verify the current official text before treating any legal detail as current.
+Use this packaged reference for legal scoping and minimum product capabilities. Refresh official sources only when the user asks.
 
 Last verified: 2026-08-09.
 
@@ -23,15 +23,17 @@ Primary sources:
 - Diario Oficial: https://www.diariooficial.interior.gob.cl/
 - Official publications of the Chilean Data Protection Agency when available
 
-As last verified on 9 August 2026, the current consolidated text applies through 30 November 2026 and the principal reform is scheduled for 1 December 2026. Verify whether this remains correct at execution time.
+As last verified on 9 August 2026, the current consolidated text applies through 30 November 2026. The principal reform is scheduled for 1 December 2026.
 
-## Select the legal operating regime
+Use this packaged verification by default. If the user requests a refresh, verify these statements with the official sources.
 
-State one regime before making legal claims:
+## Select the applicable period
 
-- `CURRENT_LAW_THROUGH_2026_11_30`: Use the current consolidated version. Do not present deferred rights, deadlines, Agency procedures, or sanctions as already effective.
-- `TRANSITION_PREPARATION_FOR_2026_REFORM`: Design or implement future readiness, but label the amended rules as deferred and keep current obligations separate.
-- `AMENDED_LAW_FROM_2026_12_01`: Use only when the relevant date is on or after the verified effective date and official sources confirm that the reform is in force.
+State one period before making legal claims:
+
+- **Current law through 30 November 2026**: Use the current consolidated version. Do not present deferred rights, deadlines, Agency procedures, or sanctions as already effective.
+- **Transition preparation for the reform scheduled for 1 December 2026**: Design or implement future readiness, but label the amended rules as deferred and keep current obligations separate.
+- **Amended law from 1 December 2026**: Use only when the relevant date is on or after the verified effective date and official sources confirm that the reform is in force.
 
 If the relevant date is missing, use current law for current legal claims and treat reform work as transition preparation. Do not infer the regime only from the user's use of “Law No. 21.719.”
 
@@ -39,7 +41,7 @@ If the relevant date is missing, use current law for current legal claims and tr
 
 The law does not mandate REST endpoints. The endpoints in this skill are technical mechanisms for making rights and duties operational.
 
-Do not decide the following from code alone:
+Do not present the following as legal facts from code alone:
 
 - Controller, processor, or joint-controller status
 - Processing purpose
@@ -51,16 +53,11 @@ Do not decide the following from code alone:
 - Whether a data-protection impact assessment is legally required
 - Whether an automated decision is legally significant
 
-Mark each unresolved item `LEGAL_INPUT_REQUIRED`.
+Describe each unresolved legal fact by its domain name. Then use `references/developer-decision-guide.md` to recommend an implementation path and continue reversible work.
 
-Use these labels when the distinction is unclear:
+A missing fact disables a production action only when the legal-blocker test passes. It never blocks unrelated schemas, runtime configuration, tests, dry runs, or manual review code.
 
-- `LAW`: A claim tied to a verified official provision and operating regime
-- `STANDARD_ENGINEERING_PRACTICE`: A repository-consistent correctness, security, testing, migration, or maintainability practice that is not attributed to an exact statutory design
-- `RISK_BASED_CONTROL`: A technical or organizational measure selected to satisfy a risk-based duty in the actual system
-- `STRICT_DEFAULT`: A conservative engineering control that is not prescribed in that exact form by law
-- `ENGINEERING_RECOMMENDATION`: A general technical recommendation. Classify it as `RISK_BASED_CONTROL` or `STRICT_DEFAULT` before reporting or implementing it
-- `LEGAL_INPUT_REQUIRED`: A decision that code or this skill cannot resolve
+Use plain language when the distinction matters. Say whether a statement is a cited legal requirement, standard engineering practice, a risk-based control, a stricter security choice, or an unresolved legal fact.
 
 ### Deferred amended-law source map
 
@@ -92,7 +89,7 @@ Current Law No. 19.628 already provides rights and duties concerning information
 | Portability | No general right identified in the current consolidated text | Articles 4 and 9 |
 | Automated decisions | No equivalent general right identified in the current consolidated text | Article 8 bis |
 
-Reverify the applicable provisions and exceptions for the specific processing activity.
+If the user requests current-source research, verify the applicable provisions and exceptions for the processing activity.
 
 Article 11 of the deferred amended text includes:
 
@@ -100,7 +97,9 @@ Article 11 of the deferred amended text includes:
 - One extension of up to another 30 calendar days
 - A response to a founded temporary-blocking request within two business days of receipt
 
-Reverify these periods. Use `America/Santiago` and a configurable Chilean business-day calendar. Do not equate business days with Monday through Friday without a holiday source.
+Use `America/Santiago` and a configurable Chilean business-day calendar. Do not equate business days with Monday through Friday without a holiday source.
+
+If the user requests current-source research, verify these periods before changing the packaged deadline ruleset.
 
 ## Registration and privacy notice
 
@@ -109,7 +108,7 @@ Record this information during registration:
 - Notice version presented
 - Contract or terms acceptance separately
 - Optional consent events separately by purpose
-- Server-approved purpose and lawful-basis identifiers
+- Server-defined purpose and lawful-basis identifiers
 
 The client must not choose the lawful basis.
 
@@ -118,7 +117,7 @@ A privacy-notice representation supports this information:
 - Controller and representative where applicable
 - Privacy contact channel
 - Data categories and subject groups
-- Purposes and approved lawful bases
+- Purposes and applicable lawful bases
 - Sources
 - Recipients and processors
 - Retention information
@@ -134,14 +133,7 @@ Publish only high-level security information. Do not expose topology, key identi
 
 Model notice, contract, and consent separately.
 
-Consent must be purpose-specific and evidenced. Use append-only events such as:
-
-```text
-CONSENT_GRANTED
-CONSENT_WITHDRAWN
-NOTICE_VERSION_CHANGED
-CONSENT_RECONFIRMED
-```
+Consent must be purpose-specific and evidenced. Record grants, withdrawals, and any legally relevant notice version durably. Reuse the repository's existing audit or history pattern.
 
 Do not:
 
@@ -168,7 +160,7 @@ Access is broader than `GET /me`. A response or export must be capable of includ
 - Applicable legitimate interests when relevant
 - Meaningful information about significant automated decisions when relevant
 
-Use adapters to collect data from all in-scope stores. Redact another person's data in shared records according to an approved policy.
+Collect data from every in-scope store using the repository's existing integration boundaries. Redact another person's data in shared records according to the applicable rule.
 
 ## Rectification
 
@@ -189,7 +181,7 @@ Deferred amended-law source: Article 7.
 
 Erasure is not a single row deletion.
 
-- Evaluate approved legal holds, statutory retention, contractual needs, claims, and exceptions
+- Evaluate applicable legal holds, statutory retention, contractual needs, claims, and exceptions
 - Support partial fulfillment with a reasoned result
 - Cover databases, replicas, caches, search, object storage, queues, analytics, exports, support tools, processors, and backups
 - Use deletion tombstones or replayable erasure events so restored backups do not reactivate erased data
@@ -203,7 +195,7 @@ Deferred amended-law source: Article 8.
 
 Scope an objection to a processing activity or purpose.
 
-- Stop future processing where the approved policy requires it
+- Stop future processing where the applicable rule requires it
 - Make direct-marketing opt-out especially simple
 - Propagate the objection to jobs, analytics, campaigns, exports, and processors
 - Do not require account authentication merely to stop marketing when a secure unsubscribe token is sufficient
@@ -214,17 +206,7 @@ Deferred amended-law source: Article 8 ter.
 
 Blocking suspends prohibited processing while allowing permitted storage or legal-hold operations.
 
-Represent blocks by:
-
-```text
-subject
-purpose_or_scope
-reason
-effective_at
-released_at
-related_request
-allowed_operations
-```
+Represent the affected subject, processing scope, reason, effective period, related request, and operations that remain permitted. Adapt the representation to the host domain.
 
 Enforce blocks in:
 
@@ -242,7 +224,7 @@ A single boolean on the user table is usually insufficient.
 
 Deferred amended-law source: Article 9.
 
-Determine whether the approved legal conditions apply before exporting.
+Determine whether the applicable legal conditions apply before exporting.
 
 - Use structured, commonly used formats such as JSON, CSV, and ZIP with a manifest
 - Include schema version, generation time, scope, and integrity metadata
@@ -265,7 +247,7 @@ Support:
 - Review outcome and communication
 - Model, rule, or policy version needed for reconstruction
 
-When not applicable, document the evidence for that conclusion. Do not add a decorative endpoint with no real human workflow.
+When not applicable, state the evidence in the final response. Do not add a decorative endpoint with no real human workflow.
 
 ## Personal identifiers and RUT
 
@@ -279,7 +261,7 @@ When not applicable, document the evidence for that conclusion. Do not add a dec
 
 ### Current-law duties
 
-Under the current regime, classify the following as `LAW` when applicable:
+Under the current regime, treat the following as legal requirements when applicable:
 
 - Article 4: legal authorization, consent, and statutory exceptions
 - Articles 6 and 9: deletion, blocking, accuracy, and purpose rules
@@ -297,50 +279,21 @@ Use `references/engineering-postures.md` to select identifier, storage, lookup, 
 
 ## Incidents
 
-Maintain an internal incident record with:
-
-```text
-discovered_at
-affected_systems
-data_categories
-estimated_subject_count
-cause
-impact
-containment
-risk_assessment
-authority_notification_decision
-authority_notification_status
-subject_notification_decision
-subject_notification_status
-sectoral_notifications
-```
+Reuse the existing incident workflow. Preserve discovery time, affected systems and data, estimated scope, cause, impact, containment, risk assessment, notification decisions, status, and sector-specific actions when applicable.
 
 - Do not import the GDPR 72-hour deadline as Chilean law
-- Reverify the current Chilean threshold and wording
-- Put authority submission behind an adapter because forms, APIs, and authentication may change
+- If the user requests source refresh, verify the current Chilean threshold and wording
+- Isolate authority submission at the external boundary when a verified interface exists
 - Preserve submission receipts and communication evidence
 - Coordinate with Law No. 21.663 and sector-specific cybersecurity duties when applicable
 
 ## Processors and international transfers
 
-Inventory hosting, storage, backups, email, SMS, CRM, analytics, support, observability, identity, payment, and other vendors.
+Inspect current hosting, storage, backups, email, SMS, CRM, analytics, support, observability, identity, payment, and other vendors.
 
-For each, record:
+For each current processor or recipient, preserve enough information to identify its role, service, processing purpose, data categories, regions, subprocessors, contract or data-processing terms, transfer mechanism, return or deletion behavior, and owner. Reuse existing vendor and delivery records before adding storage.
 
-```text
-role
-service
-processing_purpose
-data_categories
-regions
-subprocessors
-contract_or_dpa_reference
-international_transfer_mechanism
-return_or_deletion_behavior
-owner
-```
-
-Do not infer that data stays in Chile because the primary database is hosted there. Logs, backups, support access, notification services, and subprocessors may cross borders.
+Do not infer that data stays in Chile because the primary database is hosted there. Logs, backups, support access, notification services, and subprocessors can cross borders.
 
 ## Impact-assessment flags
 
