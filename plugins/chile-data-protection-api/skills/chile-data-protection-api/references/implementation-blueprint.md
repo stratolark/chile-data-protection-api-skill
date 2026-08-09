@@ -1,6 +1,6 @@
 # Framework-agnostic implementation blueprint
 
-Adapt these concepts to the host application. Do not create every table or service blindly.
+Adapt these concepts to the host application. Do not create every table or service blindly. Apply the engineering posture selected from `references/engineering-postures.md` and preserve existing stronger controls.
 
 ## Contents
 
@@ -31,11 +31,11 @@ DELETE /v1/me/consents/{purpose}
 POST   /v1/automated-decisions/{decisionId}/review   # conditional
 ```
 
-GraphQL, RPC, or event-driven systems should implement equivalent operations and guarantees.
+GraphQL, RPC, and event-driven systems must implement equivalent operations and guarantees.
 
 ## Domain building blocks
 
-Reuse existing models when possible. Common concepts include:
+Reuse existing models when possible. The concepts below are a vocabulary, not a required table list. Add only the records needed for the selected regime, posture, and current data flows:
 
 ```text
 data_subjects
@@ -58,7 +58,7 @@ privacy_incidents
 outbox_events
 ```
 
-Add indexes for operational deadlines, subject lookup, request status, tenant scope, retry state, and retention execution. Avoid plaintext-personal-data indexes.
+Add indexes for operational deadlines, subject lookup, request status, tenant scope, retry state, and retention execution. In strict mode, avoid plaintext-personal-data indexes. In baseline mode, justify any personal-data index from purpose, access, retention, and risk rather than assuming that an index is legally prohibited.
 
 ## Processing-purpose catalog
 
@@ -82,7 +82,7 @@ The API client may select an optional product preference. It must not choose the
 
 ## Privacy notice
 
-Store immutable versions. A registration or collection event should reference the version presented.
+Store immutable versions. Link each registration or collection event to the version presented.
 
 Do not mark a notice as “accepted” when it was merely displayed. Use separate events for terms acceptance and consent.
 
@@ -110,7 +110,7 @@ Process withdrawal through a durable propagation job. Track per-destination outc
 
 ## Privacy request model
 
-A request should be able to record:
+A request must support these fields when they apply:
 
 ```text
 request_id
@@ -157,7 +157,7 @@ extension_count: 0 | 1
 overdue: derived boolean
 ```
 
-An extension should normally be an event and deadline update, not a status that hides the request's actual work state.
+Record an extension as an event and deadline update. Do not use a status that hides the request's actual work state.
 
 ### Request event history
 
@@ -179,7 +179,7 @@ Do not log the same personal-data payload into events and application logs.
 
 ## Deadline service
 
-Create an interface such as:
+Use an existing date utility, a direct function, or a service boundary as complexity warrants, for example:
 
 ```text
 calculate_response_deadline(received_at, rule_version)
@@ -211,9 +211,9 @@ Potential strategies:
 
 Do not hard-code permanent document storage. Apply strict access, encryption, malware scanning where relevant, and short retention.
 
-## Data inventory adapters
+## Data inventory integration
 
-Define an adapter per domain or store:
+Integrate each in-scope domain or store using its existing service or repository boundary. Introduce a shared adapter contract only when several current stores need the same rights operations or when it isolates a real external boundary:
 
 ```text
 collect_for_access
@@ -225,7 +225,7 @@ export_for_portability
 report_recipients
 ```
 
-Each operation should return structured outcomes:
+Each operation returns structured outcomes:
 
 ```text
 completed
@@ -237,7 +237,7 @@ not_applicable
 evidence_reference
 ```
 
-Register adapters explicitly so a new datastore cannot silently escape privacy workflows.
+When adapters are justified, register them explicitly so a new datastore cannot silently escape privacy workflows. For a single store, a direct implementation plus an inventory test is usually simpler.
 
 ## Access export
 
@@ -245,7 +245,7 @@ Register adapters explicitly so a new datastore cannot silently escape privacy w
 - Redact third-party data in shared records according to approved policy
 - Use a versioned manifest and schema
 - Generate asynchronously when the result is nontrivial
-- Encrypt the artifact at rest
+- Encrypt the artifact at rest under `STRICT_ENGINEERING_DEFAULT`. Under `LEGAL_BASELINE`, select storage protection from the artifact's risk and lifetime
 - Deliver through short-lived authenticated retrieval
 - Delete according to approved artifact retention
 
@@ -254,7 +254,7 @@ Register adapters explicitly so a new datastore cannot silently escape privacy w
 - Validate the proposed change
 - Update the authoritative source
 - Update projections, caches, indexes, and derived values
-- Emit an outbox event
+- Emit an existing domain event when propagation requires it. Add an outbox only when atomic database-to-message delivery is a present requirement
 - Propagate to recipients and processors
 - Retry failures
 - Record final per-destination results
@@ -284,7 +284,7 @@ Fail closed for prohibited processing when block state is unavailable. Permit on
 
 ## Erasure orchestration
 
-A deletion plan should contain per-adapter actions and outcomes.
+A deletion plan contains actions and outcomes for each adapter.
 
 - Evaluate legal holds before destructive work
 - Support partial fulfillment
@@ -320,24 +320,25 @@ For direct transfer:
 
 ## RUT storage migration
 
-For existing plaintext RUT:
+For existing plaintext natural-person RUT:
 
-1. Add opaque subject identifiers if missing
-2. Add encrypted RUT, keyed lookup, and key-version fields
-3. Backfill in bounded, resumable batches
-4. Add dual read or dual write when zero downtime requires it
-5. Validate counts and lookup correctness without printing RUT
-6. Update foreign references and API contracts
-7. Remove plaintext indexes and columns only after rollout validation
-8. Preserve rollback or recovery instructions
+1. Inventory every copy, index, relationship, public contract, export, and telemetry path
+2. Record the legal purpose, necessity, retention, tenant or controller scope, and selected engineering posture
+3. Preserve existing stronger protections in every posture
+4. Under `LEGAL_BASELINE`, implement the least-complex adequate storage, access, lookup, and migration controls supported by the threat model
+5. Under `STRICT_ENGINEERING_DEFAULT`, add a surrogate subject identifier if missing, encrypted canonical RUT, keyed lookup when exact lookup is required, and key-version fields
+6. Backfill in bounded, resumable batches and use dual read or dual write when zero downtime requires it
+7. Validate counts and lookup correctness without printing RUT
+8. Update foreign references and API contracts
+9. Remove legacy plaintext only after rollout validation and recovery planning
 
-Key rotation should support multiple active lookup versions during migration when needed.
+When strict encryption or keyed lookup is selected, support key rotation and multiple active lookup versions during migration when needed.
 
 ## Retention and legal holds
 
 Represent retention by purpose and data category, not merely by account age.
 
-A retention executor should:
+A retention executor performs these operations:
 
 - Select eligible records
 - Check legal holds
@@ -365,9 +366,9 @@ propagation_status
 
 Store references and safe metadata rather than copies of full payloads.
 
-## Incident reporting adapter
+## Incident reporting boundary
 
-Define an interface such as:
+Reuse the existing incident workflow. Introduce a submission interface only when the application currently needs to support multiple destinations, an external authority boundary, or testable submission behavior, for example:
 
 ```text
 assess_incident(incident)
@@ -414,7 +415,7 @@ Adapt names to the repository. Do not put secrets or exploit-relevant internals 
 
 1. Legal and scope record
 2. Discovery and data-flow inventory
-3. Opaque subject identity and RUT migration
+3. Subject identity and posture-appropriate RUT migration
 4. Purpose, notice, and consent models
 5. Rights-request case management and deadlines
 6. Data inventory adapters

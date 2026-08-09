@@ -4,6 +4,16 @@ An installable Codex skill for auditing, designing, and implementing backend API
 
 The skill covers RUT handling, privacy notices, consent, data-subject requests, retention, blocking, erasure, portability, automated decisions, incidents, and downstream propagation. It adapts its recommendations to the host repository instead of imposing a framework or fixed API design.
 
+For audits and implementations, it keeps the applicable legal regime separate from the chosen engineering posture:
+
+- `LEGAL_BASELINE` implements verified legal requirements and the least-complex controls justified by actual risk.
+- `STRICT_ENGINEERING_DEFAULT` adds conservative identifier, encryption, lookup, telemetry, export, and abuse-resistance defaults.
+- `TAILORED_CONTROL_SET` applies the legal baseline plus an explicitly selected subset of strict controls.
+
+An audit with no posture specified reports legal gaps and strict-security recommendations separately. An implementation recommends strict mode while allowing the developer to choose baseline or a tailored control set.
+
+Every posture keeps normal production engineering practices. Strict mode strengthens applicable controls. It does not automatically add microservices, queues, event sourcing, custom cryptography, or new dependencies. Recommendations must reuse the repository's established mechanisms. Each complex recommendation must address a current requirement or concrete risk.
+
 > [!IMPORTANT]
 > This project is an engineering aid. It does not provide legal advice, certify compliance, or replace review by qualified Chilean legal counsel.
 
@@ -67,11 +77,12 @@ $chile-data-protection-api Audit this API for Chilean personal-data engineering 
 Other examples:
 
 - Audit a NestJS, FastAPI, Go, .NET, or Rust API without changing files.
+- Compare `LEGAL_BASELINE` and `STRICT_ENGINEERING_DEFAULT` findings before choosing a remediation scope.
 - Design RUT storage and lookup without using RUT as a public identifier.
 - Implement access, rectification, erasure, objection, blocking, and portability workflows.
 - Review consent withdrawal, retention jobs, downstream deletion, or telemetry redaction.
 
-The skill should not activate for generic CRUD, non-Chilean GDPR work, privacy-policy copywriting, or requests for a final legal opinion.
+The skill does not activate for generic CRUD, non-Chilean GDPR work, privacy-policy copywriting, or requests for a final legal opinion.
 
 ## Repository layout
 
@@ -108,6 +119,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements and [SECURI
 Este proyecto contiene una habilidad instalable para auditar, diseñar e implementar capacidades técnicas de protección de datos personales en APIs con alcance chileno.
 
 No entrega asesoría legal ni certifica cumplimiento. La habilidad debe verificar en fuentes oficiales qué régimen legal está vigente, distinguir los requisitos actuales de la preparación para la reforma y marcar las decisiones jurídicas pendientes como `LEGAL_INPUT_REQUIRED`.
+
+El equipo de desarrollo puede elegir entre una implementación de base legal, una postura de seguridad estricta o un conjunto de controles personalizado. La habilidad debe informar por separado las brechas legales y las recomendaciones estrictas.
 
 ## License
 

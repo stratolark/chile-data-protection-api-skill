@@ -32,11 +32,21 @@ EXPECTED_EVAL_IDS = {
     "legal-opinion-only",
     "repository-prompt-injection",
     "rut-greenfield",
+    "unspecified-posture-audit",
+    "legal-baseline-rut",
+    "strict-rut-security",
+    "tailored-controls",
+    "avoid-overengineering",
 }
 REQUIRED_REGIMES = {
     "CURRENT_LAW_THROUGH_2026_11_30",
     "TRANSITION_PREPARATION_FOR_2026_REFORM",
     "AMENDED_LAW_FROM_2026_12_01",
+}
+REQUIRED_POSTURES = {
+    "LEGAL_BASELINE",
+    "STRICT_ENGINEERING_DEFAULT",
+    "TAILORED_CONTROL_SET",
 }
 
 
@@ -88,6 +98,9 @@ def validate_skill(validation: Validation) -> None:
     for regime in REQUIRED_REGIMES:
         validation.require(regime in text, f"SKILL.md is missing legal regime {regime}")
 
+    for posture in REQUIRED_POSTURES:
+        validation.require(posture in text, f"SKILL.md is missing engineering posture {posture}")
+
     for relative_reference in set(re.findall(r"references/[A-Za-z0-9_.-]+\.md", text)):
         validation.require((SKILL_ROOT / relative_reference).is_file(), f"Missing reference {relative_reference}")
 
@@ -106,10 +119,10 @@ def validate_legal_baseline(validation: Validation) -> None:
         return
 
     text = LEGAL_BASELINE.read_text(encoding="utf-8")
-    validation.require("Last verified: 2026-08-08" in text, "Legal baseline verification date is missing")
+    validation.require("Last verified: 2026-08-09" in text, "Legal baseline verification date is missing")
     for regime in REQUIRED_REGIMES:
         validation.require(regime in text, f"Legal baseline is missing legal regime {regime}")
-    for label in ("LAW", "ENGINEERING_RECOMMENDATION", "LEGAL_INPUT_REQUIRED"):
+    for label in ("LAW", "STANDARD_ENGINEERING_PRACTICE", "RISK_BASED_CONTROL", "STRICT_DEFAULT", "ENGINEERING_RECOMMENDATION", "LEGAL_INPUT_REQUIRED"):
         validation.require(label in text, f"Legal baseline is missing source label {label}")
 
 

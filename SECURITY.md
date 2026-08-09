@@ -20,4 +20,4 @@ Relevant reports include:
 - Cross-tenant, authorization, export, RUT, or deletion guidance that creates a concrete security weakness
 - Malicious or unsafe packaged assets, scripts, hooks, or dependencies
 
-Incorrect or outdated legal information without a security impact should use the legal-source issue template instead.
+Use the legal-source issue template for incorrect or outdated legal information that has no security impact.

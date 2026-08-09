@@ -1,7 +1,7 @@
 interface:
   display_name: "Chile Data Protection API"
   short_description: "Engineer Chilean personal-data API workflows"
-  default_prompt: "Use $chile-data-protection-api to audit this API for Chilean data-protection engineering gaps."
+  default_prompt: "Use $chile-data-protection-api to audit this API and separate Chilean legal-baseline gaps from strict engineering recommendations."
 
 policy:
   allow_implicit_invocation: true

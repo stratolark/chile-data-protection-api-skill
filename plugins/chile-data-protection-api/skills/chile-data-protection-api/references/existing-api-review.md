@@ -86,6 +86,8 @@ Before adding code, search for existing:
 
 Reuse reliable capabilities rather than building duplicates.
 
+Apply the simplicity gate before recommending a new privacy service, adapter layer, queue, event model, dependency, or cryptographic subsystem. Identify the current requirement, existing repository pattern, operational cost, and the smallest complete alternative.
+
 ## Gap matrix
 
 For each gap, provide:
@@ -93,11 +95,16 @@ For each gap, provide:
 ```text
 id
 requirement_or_capability
+classification
+engineering_posture
 current_behavior
 evidence
 affected_data_and_users
 risk
 recommended_change
+existing_project_pattern
+smallest_complete_change
+complexity_and_operational_cost
 files_or_components
 dependency
 legal_input_needed
@@ -112,16 +119,16 @@ Suggested priority scale:
 - `P2`: incomplete propagation, weak auditability, brittle operations, or significant documentation gap
 - `P3`: hardening, maintainability, or lower-risk completeness improvement
 
-Do not inflate priority solely because an endpoint name differs from the illustrative blueprint.
+Do not inflate priority solely because an endpoint name differs from the illustrative blueprint. Do not assign legal impact to a missing `STRICT_DEFAULT`. Report its security benefit and implementation cost separately.
 
 ## Migration review
 
-When existing records contain RUT or other personal data:
+When existing records contain RUT or other personal data, select the migration controls from `references/engineering-postures.md`:
 
 - Identify plaintext columns, indexes, foreign keys, cache keys, and downstream copies
-- Design new opaque identifiers and relationship migration
-- Add encrypted value and keyed lookup fields
-- Version keys
+- Under every posture, identify applicable legal duties, material risks, and existing stronger controls
+- Under `STRICT_ENGINEERING_DEFAULT`, design surrogate identifiers and add encrypted value, keyed lookup when exact lookup is required, and key-version fields
+- Under `LEGAL_BASELINE`, select the least-complex adequate storage and lookup controls from the actual threat model. Do not claim that omitted strict controls are universally unnecessary
 - Backfill in bounded, resumable batches
 - Avoid printing personal data in migration logs
 - Use dual read or dual write where zero-downtime rollout requires it
@@ -164,10 +171,10 @@ Inspect:
 Return:
 
 1. Scope and detected architecture
-2. Legal-verification status
+2. Legal-verification status and engineering posture. Use dual-track findings when no posture was selected
 3. Controller and processor assumptions
 4. Processing inventory summary
-5. Confirmed findings with evidence
+5. Confirmed findings with evidence, separating `LAW_GAP` from `STRICT_DEFAULT_GAP`
 6. Unknowns and `LEGAL_INPUT_REQUIRED` decisions
 7. Prioritized remediation sequence
 8. Proposed code areas and tests

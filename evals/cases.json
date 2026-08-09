@@ -72,7 +72,56 @@
     "expect": {
       "activate": true,
       "mode": "GREENFIELD_IMPLEMENTATION",
-      "must": ["opaque_subject_id", "keyed_rut_lookup", "legal_input_required"]
+      "engineering_posture": "STRICT_ENGINEERING_DEFAULT_ASSUMPTION",
+      "must": ["recommend_posture_choice", "opaque_subject_id", "keyed_rut_lookup_when_lookup_required", "legal_input_required"]
+    }
+  },
+  {
+    "id": "unspecified-posture-audit",
+    "prompt": "Audit this Chilean customer API for data-protection and security gaps without changing files.",
+    "expect": {
+      "activate": true,
+      "mode": "AUDIT_ONLY",
+      "engineering_posture": "DUAL_TRACK",
+      "must": ["separate_law_gaps", "separate_strict_default_gaps", "do_not_block_on_posture_choice"]
+    }
+  },
+  {
+    "id": "legal-baseline-rut",
+    "prompt": "Implement only the verified Chilean legal baseline for this RUT API. Do not add strict controls unless the actual risk requires them.",
+    "expect": {
+      "activate": true,
+      "engineering_posture": "LEGAL_BASELINE",
+      "must": ["standard_engineering_practices", "risk_based_security", "preserve_stronger_controls", "explain_omitted_strict_controls", "avoid_speculative_architecture"],
+      "must_not": ["claim_hmac_is_universally_required", "claim_uuid_is_universally_required", "remove_stronger_controls"]
+    }
+  },
+  {
+    "id": "strict-rut-security",
+    "prompt": "Implement the strict engineering default for natural-person RUT storage and lookup in this API.",
+    "expect": {
+      "activate": true,
+      "engineering_posture": "STRICT_ENGINEERING_DEFAULT",
+      "must": ["surrogate_subject_id", "encrypt_recoverable_rut", "keyed_lookup_when_lookup_required", "telemetry_exclusion", "key_rotation"]
+    }
+  },
+  {
+    "id": "tailored-controls",
+    "prompt": "Use the legal baseline, but add strict telemetry redaction and opaque public IDs. Keep database storage unchanged for now.",
+    "expect": {
+      "activate": true,
+      "engineering_posture": "TAILORED_CONTROL_SET",
+      "must": ["record_selected_controls", "record_rejected_controls", "do_not_weaken_existing_storage_security"]
+    }
+  },
+  {
+    "id": "avoid-overengineering",
+    "prompt": "Implement the legal baseline in this small single-database API. It does not search by RUT and already has authorization, migrations, and encrypted storage.",
+    "expect": {
+      "activate": true,
+      "engineering_posture": "LEGAL_BASELINE",
+      "must": ["reuse_existing_controls", "smallest_complete_change", "preserve_authorization", "behavior_focused_tests"],
+      "must_not": ["add_hmac_without_lookup", "add_privacy_microservice", "add_queue_without_boundary", "add_adapter_framework_for_one_store", "invent_cryptography"]
     }
   }
 ]

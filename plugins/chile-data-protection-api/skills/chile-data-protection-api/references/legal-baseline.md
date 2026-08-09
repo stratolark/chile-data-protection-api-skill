@@ -2,14 +2,14 @@
 
 Use this reference for legal scoping and the minimum product capabilities. Verify the current official text before treating any legal detail as current.
 
-Last verified: 2026-08-08.
+Last verified: 2026-08-09.
 
 ## Contents
 
 - Official sources and legal operating regime
 - Interpretive boundary and source map
 - Rights, notices, consent, and request handling
-- RUT, incidents, processors, and transfers
+- Personal identifiers, RUT, incidents, processors, and transfers
 - Impact-assessment flags
 
 ## Official sources
@@ -17,12 +17,13 @@ Last verified: 2026-08-08.
 Primary sources:
 
 - Law No. 21.719, Biblioteca del Congreso Nacional: https://www.bcn.cl/leychile/navegar?idNorma=1209272
+- Law No. 21.806, which modified Law No. 21.719, Biblioteca del Congreso Nacional: https://www.bcn.cl/leychile/navegar?idNorma=1221118
 - Current consolidated Law No. 19.628 through 2026-11-30, Biblioteca del Congreso Nacional: https://www.bcn.cl/leychile/Navegar?dt=open&idLey=19628
 - Consolidated Law No. 19.628 effective 2026-12-01, Biblioteca del Congreso Nacional: https://www.bcn.cl/leychile/Navegar?idNorma=141599&idVersion=2026-12-01
 - Diario Oficial: https://www.diariooficial.interior.gob.cl/
 - Official publications of the Chilean Data Protection Agency when available
 
-As last verified on 8 August 2026, the current consolidated text applies through 30 November 2026 and the principal reform is scheduled for 1 December 2026. Verify whether this remains correct at execution time.
+As last verified on 9 August 2026, the current consolidated text applies through 30 November 2026 and the principal reform is scheduled for 1 December 2026. Verify whether this remains correct at execution time.
 
 ## Select the legal operating regime
 
@@ -52,10 +53,13 @@ Do not decide the following from code alone:
 
 Mark each unresolved item `LEGAL_INPUT_REQUIRED`.
 
-Use these labels when the distinction could be unclear:
+Use these labels when the distinction is unclear:
 
 - `LAW`: A claim tied to a verified official provision and operating regime
-- `ENGINEERING_RECOMMENDATION`: A technical control that helps implement or secure a capability but is not prescribed as that exact design by law
+- `STANDARD_ENGINEERING_PRACTICE`: A repository-consistent correctness, security, testing, migration, or maintainability practice that is not attributed to an exact statutory design
+- `RISK_BASED_CONTROL`: A technical or organizational measure selected to satisfy a risk-based duty in the actual system
+- `STRICT_DEFAULT`: A conservative engineering control that is not prescribed in that exact form by law
+- `ENGINEERING_RECOMMENDATION`: A general technical recommendation. Classify it as `RISK_BASED_CONTROL` or `STRICT_DEFAULT` before reporting or implementing it
 - `LEGAL_INPUT_REQUIRED`: A decision that code or this skill cannot resolve
 
 ### Deferred amended-law source map
@@ -76,16 +80,19 @@ The article numbers below refer to the consolidated version scheduled for 1 Dece
 
 ## Rights baseline
 
-The deferred amended framework recognizes these rights. Before its verified effective date, treat this list as transition preparation rather than a statement of current law:
+Current Law No. 19.628 already provides rights and duties concerning information or access, modification, cancellation, and blocking in Articles 6 and 12. Article 3 also permits opposition to use for advertising, market research, or opinion polling. Do not imply that all data-subject rights begin with Law No. 21.719.
 
-```text
-ACCESS
-RECTIFICATION
-ERASURE
-OBJECTION
-PORTABILITY
-BLOCKING
-```
+| Capability | Current law through 2026-11-30 | Deferred amended law from 2026-12-01 |
+| --- | --- | --- |
+| Access or information | Article 12 | Articles 4 and 5 |
+| Rectification or modification | Articles 6 and 12 | Articles 4 and 6 |
+| Erasure or cancellation | Articles 6 and 12, subject to conditions and exceptions | Articles 4 and 7 |
+| Objection | Article 3 for advertising, market research, and opinion polling. Article 12 also addresses voluntary or commercial-communication data | Articles 4 and 8 provide a broader right |
+| Blocking | Articles 6 and 12 | Articles 4 and 8 ter |
+| Portability | No general right identified in the current consolidated text | Articles 4 and 9 |
+| Automated decisions | No equivalent general right identified in the current consolidated text | Article 8 bis |
+
+Reverify the applicable provisions and exceptions for the specific processing activity.
 
 Article 11 of the deferred amended text includes:
 
@@ -97,7 +104,7 @@ Reverify these periods. Use `America/Santiago` and a configurable Chilean busine
 
 ## Registration and privacy notice
 
-Registration should record:
+Record this information during registration:
 
 - Notice version presented
 - Contract or terms acceptance separately
@@ -106,7 +113,7 @@ Registration should record:
 
 The client must not choose the lawful basis.
 
-A privacy-notice representation should be capable of covering:
+A privacy-notice representation supports this information:
 
 - Controller and representative where applicable
 - Privacy contact channel
@@ -260,40 +267,33 @@ Support:
 
 When not applicable, document the evidence for that conclusion. Do not add a decorative endpoint with no real human workflow.
 
-## RUT
+## Personal identifiers and RUT
 
-Treat a natural person's RUT as personal data and an identity attribute.
+### Legal classification
 
-The storage and lookup design below is an `ENGINEERING_RECOMMENDATION`, not a claim that the law prescribes these exact fields or cryptographic primitives.
+- A natural person's RUT or RUN is personal data because it identifies or makes a natural person identifiable.
+- A name, personal email, phone number, or address is personal data when it is linked or reasonably linkable to a natural person.
+- A company RUT or generic company contact is not personal data solely because it identifies a legal entity. Reassess when the record identifies or concerns a natural person.
+- RUT, name, email, phone, and address are not sensitive data merely by category under the current or deferred statutory definitions. Their context or combination can reveal sensitive information or create higher security impact.
+- Public availability does not stop information from being personal data. Under current law, specific public-source exceptions can affect authorization and purpose rules. Do not generalize those exceptions. Under amended law, public availability is not a universal lawful basis.
 
-### Ingress
+### Current-law duties
 
-- Normalize to one canonical representation on the server
-- Validate the check digit with a tested Chilean Modulo 11 implementation
-- Accept display formatting only at the boundary
-- Use generic errors when detailed validation or duplicate responses create enumeration risk
+Under the current regime, classify the following as `LAW` when applicable:
 
-### Storage and lookup
+- Article 4: legal authorization, consent, and statutory exceptions
+- Articles 6 and 9: deletion, blocking, accuracy, and purpose rules
+- Article 7: secrecy for data from non-public sources and related database information
+- Article 11: due diligence and responsibility for damage
+- Article 12: information, modification, cancellation, and blocking rights
 
-Prefer an equivalent of:
+The current law does not universally prescribe UUIDs, field-level encryption, HMAC lookup columns, or a categorical list of prohibited infrastructure locations.
 
-```text
-data_subjects
-  id: opaque UUID or equivalent
-  rut_ciphertext: encrypted canonical RUT
-  rut_lookup_hmac: deterministic keyed lookup value
-  rut_key_version
-  created_at
-```
+### Deferred amended-law duties
 
-- Encrypt the recoverable RUT
-- Use a keyed HMAC for exact lookup
-- Do not use plain SHA-256 because the possible RUT space is enumerable
-- Keep keys outside the database in an approved secret or key-management system
-- Include rotation and backfill behavior
-- Scope uniqueness by tenant or controller where needed
+From the verified effective date, Article 3 adds explicit purpose, proportionality, security, and responsibility principles. Articles 14 quáter and 14 quinquies require privacy by design/default and risk-appropriate security. Encryption and pseudonymization are examples of possible measures, not mandatory universal implementations.
 
-Never use raw RUT in URLs, JWTs, sessions, logs, traces, metrics, analytics, filenames, object names, queue names, cache keys, partition keys, or idempotency keys. Never use RUT alone as authentication.
+Use `references/engineering-postures.md` to select identifier, storage, lookup, telemetry, and migration controls. Treat Modulo 11 validation only as syntax validation. It does not prove that a RUT exists, belongs to the claimant, or authenticates a person.
 
 ## Incidents
 

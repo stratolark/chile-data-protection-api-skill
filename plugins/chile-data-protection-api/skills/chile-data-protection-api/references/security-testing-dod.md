@@ -1,6 +1,6 @@
 # Security, testing, and definition of done
 
-Use this reference before finalizing any audit or implementation.
+Use this reference before finalizing any audit or implementation. Apply checks according to the selected posture in `references/engineering-postures.md`. Never weaken existing stronger controls.
 
 ## Contents
 
@@ -11,7 +11,7 @@ Use this reference before finalizing any audit or implementation.
 
 ## Authentication and authorization
 
-- Map an authenticated principal to an opaque subject identifier
+- Map an authenticated principal to a stable subject identifier. Use a non-RUT opaque identifier under `STRICT_ENGINEERING_DEFAULT`
 - Prevent IDOR across privacy requests, artifacts, decisions, and admin actions
 - Test cross-tenant isolation
 - Use step-up authentication for high-risk result delivery and changes
@@ -24,7 +24,7 @@ Use this reference before finalizing any audit or implementation.
 ## Export security
 
 - Generate asynchronously when nontrivial
-- Encrypt at rest
+- Encrypt at rest under `STRICT_ENGINEERING_DEFAULT`. Under `LEGAL_BASELINE`, select equivalent storage protection from the artifact's sensitivity, exposure, and lifetime
 - Use short-lived authenticated or signed retrieval
 - Use safe filenames without RUT, email, or name
 - Set cache-control and content-disposition correctly
@@ -48,9 +48,9 @@ Inspect and test:
 - Dead-letter queues
 - APM and analytics
 
-Redact RUT, names, emails, phones, addresses, identity evidence, consent evidence, request content, and export data.
+Define the purpose, approved fields, access, and retention for telemetry. Reject raw RUT, names, emails, phones, addresses, identity evidence, consent evidence, request content, and export data unless a documented operational need and reviewed protection justify the specific field.
 
-Do not use personal values as high-cardinality metric labels. Capture actual test telemetry and assert that sensitive values are absent.
+Do not use personal values as metric labels. Under `STRICT_ENGINEERING_DEFAULT`, capture actual test telemetry and assert that raw personal values are absent unless an explicit reviewed exception exists. Under `LEGAL_BASELINE`, assert that unapproved or unnecessary personal values are absent and that approved values meet their access, security, and retention rules.
 
 ## Abuse resistance
 
@@ -64,17 +64,17 @@ Do not use personal values as high-cardinality metric labels. Capture actual tes
 
 ## Unit tests
 
-Cover at least:
+Cover the applicable controls for the selected posture, including:
 
 - RUT normalization and valid or invalid check digits
-- Keyed lookup and key-version behavior
+- Keyed lookup and key-version behavior when that strict or risk-based design is selected
 - Deadline calculation across month boundaries, daylight-saving changes, weekends, and Chilean holidays
 - State transitions and invalid transitions
 - One-extension limit
 - Purpose-scoped consent and objection
 - Block-policy decisions
 - Retention and legal holds
-- Redaction helpers
+- Telemetry allowlisting or redaction helpers
 - Artifact-expiry decisions
 
 ## Integration and end-to-end tests
@@ -107,7 +107,7 @@ Cover at least:
 - Cross-tenant access
 - Privilege escalation into admin operations
 - Enumeration through registration and verification responses
-- Raw RUT or other personal data in logs, traces, metrics, URLs, tokens, filenames, and errors
+- Unapproved raw RUT or other personal data in logs, traces, metrics, URLs, tokens, filenames, and errors. In strict mode, test for absence unless a reviewed exception exists
 - Export retrieval after expiration
 - Reuse of an export credential
 - SSRF through a portability destination
@@ -123,9 +123,9 @@ Cover at least:
 - Test migrations on representative existing data
 - Test backfill resumability and idempotency
 - Verify rollback or recovery behavior
-- Verify safe failure when encryption or HMAC keys are missing
+- Verify safe failure when encryption or HMAC keys are part of the selected design and are missing
 - Verify no plaintext personal data appears in migration logs
-- Verify tenant-scoped uniqueness and lookup behavior
+- Verify tenant-scoped uniqueness and lookup behavior when required by the data model
 
 ## Operational checks
 
@@ -161,14 +161,15 @@ Document:
 - Incident and processor propagation runbooks
 - Remaining `LEGAL_INPUT_REQUIRED` items
 
-## Prohibited shortcuts
+## Prohibited shortcuts in every posture
 
 Do not:
 
 - Add only `DELETE /me` and call erasure complete
 - Add controllers without tracing downstream data
-- Use RUT as a primary key, public ID, password, or authentication factor
-- Put raw RUT in routes, tokens, logs, metrics, traces, filenames, or cache keys
+- Treat RUT, name, email, or phone as authentication by itself
+- Describe a strict engineering default as an exact statutory requirement
+- Remove or weaken an existing stronger control merely because baseline mode is selected
 - Let clients choose a lawful basis
 - Treat a displayed notice as consent
 - Bundle optional consent into required terms
@@ -184,14 +185,23 @@ Do not:
 - Delete data under a legal hold without an approved decision
 - Hide uncertainty behind confident wording
 
-## Definition of done
+## Strict-posture prohibitions
+
+Under `STRICT_ENGINEERING_DEFAULT`, do not:
+
+- Use natural-person RUT as a primary key or public identifier
+- Put raw natural-person RUT in routes, bearer tokens, client-visible sessions, logs, metrics, traces, analytics, filenames, object names, queue names, cache keys, partition keys, or idempotency keys
+- Use an unkeyed hash for exact RUT lookup
+- Store recoverable RUT without the selected field or equivalent protection and key-management design
+
+## Definition of done for every posture
 
 Do not call the work complete until every applicable item is true:
 
 - The existing API was reviewed or the greenfield architecture was stated
 - The responsibility and tenant model is documented or marked `LEGAL_INPUT_REQUIRED`
 - The processing inventory covers all known stores, queues, processors, exports, telemetry, and backups
-- RUT is absent from prohibited identifiers and telemetry
+- Identifier handling matches the selected posture and approved exceptions
 - Notice presentation, contract acceptance, and optional consent are separate
 - Privacy requests have durable intake, verification, deadline, decision, execution, result, and audit behavior
 - Access, rectification, erasure, objection, blocking, and portability are implemented or explicitly not applicable with approved reasoning
@@ -202,7 +212,7 @@ Do not call the work complete until every applicable item is true:
 - Exports are authenticated, short-lived, and removed safely
 - Admin operations are authorized and audited
 - Incident reporting uses a configurable adapter
-- Tested telemetry contains no raw personal data
+- Tested telemetry contains no unapproved or unnecessary raw personal data
 - API or event contracts are updated
 - Migrations and backfills are safe and documented
 - Relevant tests pass, or failures and unrun tests are reported exactly
@@ -210,11 +220,28 @@ Do not call the work complete until every applicable item is true:
 - Legal assumptions remain visible
 - The final report does not claim or guarantee compliance
 
+For `LEGAL_BASELINE`, also confirm:
+
+- Every implemented control is labeled `LAW`, `STANDARD_ENGINEERING_PRACTICE`, or `RISK_BASED_CONTROL`
+- The result follows established repository architecture and avoids speculative subsystems, dependencies, and abstractions
+- Omitted strict controls are not reported as legal failures and have an evidence-backed risk rationale when material
+- Legal or security owners are identified for unresolved decisions and residual risk without inventing approval
+
+For `STRICT_ENGINEERING_DEFAULT`, also confirm:
+
+- Applicable `STRICT_DEFAULT` identifier, encryption, lookup, telemetry, export, and enumeration controls are implemented and tested
+- Skipped strict controls are recorded as not applicable with evidence
+- New operational machinery passes the simplicity gate and has an identified owner, failure mode, and test
+
+For `TAILORED_CONTROL_SET`, also confirm:
+
+- Selected and rejected strict controls, tradeoffs, owner, and review date are recorded
+
 ## Final implementation report
 
 Return:
 
-1. Scope and mode
+1. Scope, mode, and engineering posture
 2. Legal verification status
 3. Architecture and data-flow decisions
 4. Files and symbols changed
@@ -226,5 +253,6 @@ Return:
 10. Exact commands run and results
 11. Deployment, keys, configuration, and rollout
 12. Remaining limitations and `LEGAL_INPUT_REQUIRED` decisions
+13. Strict controls applied, skipped, or deferred
 
 Never state that tests passed when they were not run. Never hide a partial implementation behind a general statement of completion.

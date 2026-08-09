@@ -33,7 +33,7 @@ Use primary official Chilean sources. Do not convert an unresolved legal questio
 
 ## Pull-request review
 
-Reviewers should confirm that the change:
+Reviewers must confirm that the change:
 
 - Does not claim or guarantee compliance
 - Does not weaken authentication, authorization, validation, secret handling, telemetry redaction, or security tests
