@@ -20,7 +20,7 @@ The skill requires every invocation to verify the applicable legal regime from o
 After this repository is published, add its marketplace and install the plugin:
 
 ```text
-codex plugin marketplace add stratolark/chile-data-protection-api
+codex plugin marketplace add stratolark/chile-data-protection-api-skill
 codex plugin add chile-data-protection-api@chile-data-protection
 ```
 
@@ -29,7 +29,7 @@ Start a new Codex thread after installation.
 For standalone local experimentation, ask `$skill-installer` to install `chile-data-protection-api` from:
 
 ```text
-https://github.com/stratolark/chile-data-protection-api/tree/main/plugins/chile-data-protection-api/skills/chile-data-protection-api
+https://github.com/stratolark/chile-data-protection-api-skill/tree/main/plugins/chile-data-protection-api/skills/chile-data-protection-api
 ```
 
 ## Use

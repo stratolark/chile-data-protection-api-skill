@@ -8,7 +8,7 @@ Security fixes are applied to the latest published release. Older releases may n
 
 Use a private GitHub security advisory:
 
-https://github.com/stratolark/chile-data-protection-api/security/advisories/new
+https://github.com/stratolark/chile-data-protection-api-skill/security/advisories/new
 
 Do not open a public issue for a vulnerability. Do not include credentials, real personal data, production logs, identity documents, or active exploit details in public discussions.
 

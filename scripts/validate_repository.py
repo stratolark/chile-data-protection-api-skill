@@ -121,7 +121,7 @@ def validate_plugin(validation: Validation) -> None:
     validation.require(plugin.get("name") == EXPECTED_SKILL_NAME, "Plugin name is invalid")
     validation.require(bool(re.fullmatch(r"\d+\.\d+\.\d+", str(plugin.get("version", "")))), "Plugin version must use strict SemVer")
     validation.require(plugin.get("license") == "MIT", "Plugin license must match LICENSE")
-    validation.require(plugin.get("repository") == "https://github.com/stratolark/chile-data-protection-api", "Plugin repository URL is invalid")
+    validation.require(plugin.get("repository") == "https://github.com/stratolark/chile-data-protection-api-skill", "Plugin repository URL is invalid")
     validation.require(plugin.get("skills") == "./skills/", "Plugin skills path is invalid")
     validation.require(isinstance(plugin.get("author"), dict) and bool(plugin["author"].get("name")), "Plugin author name is required")
     interface = plugin.get("interface")
