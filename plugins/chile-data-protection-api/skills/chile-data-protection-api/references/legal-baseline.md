@@ -47,6 +47,12 @@ The article numbers below refer to the consolidated version scheduled for 1 Dece
 | Blocking | Article 8 ter |
 | Portability | Article 9 |
 | Exercise channels and procedure | Articles 10 and 11 |
+| Retention proportionality | Article 3 |
+| Transparency and notice | Article 14 ter |
+| Privacy by design and default | Article 14 quáter |
+| Risk-appropriate security | Article 14 quinquies |
+| Personal-data incidents | Article 14 sexies |
+| Impact assessment | Article 15 ter |
 
 ## Rights baseline
 
@@ -82,6 +88,10 @@ Rectification applies to inaccurate or incomplete personal data and can require 
 
 Erasure or cancellation is subject to the applicable conditions, retention duties, holds, claims, and exceptions. Account closure and erasure are not the same legal or technical action. Reversible pseudonymization is not irreversible anonymization.
 
+Amended Article 3 permits retention only while necessary for the processing purpose, subject to legal exceptions. Article 7 provides erasure grounds when data is no longer necessary, consent is revoked without another legal basis, processing was unlawful, data is stale, deletion follows a binding decision or duty, or a valid objection leaves no other legal basis. Article 7 also preserves processing needed for expression and information, a legal duty or contract, public functions or interests, public health, qualifying historical, statistical or scientific work, and legal claims.
+
+Implement the grounds and exceptions that apply to the product. Route an uncertain exception to manual review instead of disabling unrelated erasure. Article 8 ter governs temporary blocking while a request is resolved and is not the legal basis for a retention schedule.
+
 ## Objection and blocking
 
 Under current law, Article 3 covers opposition to advertising, market research, and opinion polling, while Article 12 also addresses voluntary or commercial-communication data. The amended Article 8 provides a broader objection right.
@@ -114,7 +124,9 @@ Modulo 11 validation proves syntax only. Exact RUT lookup or contact deduplicati
 
 ## Incidents
 
-Do not import the GDPR 72-hour deadline as Chilean law. If incident notification is in scope and the user requests a refresh, verify the current Chilean threshold, recipient, timing, and wording. Coordinate with Law No. 21.663 and applicable sector cybersecurity rules.
+Amended Article 14 sexies requires reporting qualifying personal-data security breaches to the Agency without undue delay when there is a reasonable risk to people's rights and freedoms. It also requires records of the communication. Notice to affected people applies to the categories stated in that article. Do not import the GDPR 72-hour deadline as Chilean law.
+
+Reuse the organization's incident process when it can capture the assessment, affected data and people, effects, response measures, notification decision, content, destination, and evidence. Refresh sources before hard-coding an Agency transport, payload, or deadline that depends on later instructions. Coordinate with Law No. 21.663 and applicable sector cybersecurity rules.
 
 ## Processors and international transfers
 
@@ -124,4 +136,6 @@ Establish each current party's role, purpose, data categories, regions, subproce
 
 ## Impact-assessment flags
 
-Flag for legal review systematic evaluation, significant automated decisions, large-scale processing, systematic monitoring of public areas, sensitive data, biometric identification, children's data, high-risk dataset combinations, or novel technology with material effects on people.
+Amended Article 15 ter requires an impact assessment before high-risk processing begins. It always covers systematic and exhaustive evaluation based on automated processing with significant legal effects, large-scale processing, systematic monitoring of public areas, and sensitive or specially protected data processed under a consent exception.
+
+Also flag other processing whose nature, scope, context, technology, or purpose probably creates high risk. Record whether the trigger is applicable, not applicable, or unknown. Do not invent a code subsystem for the assessment. Identify the processing boundary and technical mitigations, then use the organization's existing risk or review process.

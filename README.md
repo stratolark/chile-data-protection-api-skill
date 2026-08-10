@@ -15,7 +15,7 @@ An audit with no posture specified reports legal gaps and strict-security recomm
 
 The skill gives developers a complete implementation path. It makes technical decisions from repository evidence and explains alternatives only when they change a current tradeoff. A production action stays disabled only when a cited law makes a missing fact a precondition for that action. Code, migrations, tests, runtime configuration, and dry runs can continue.
 
-Audit mode gives a technical-readiness verdict for ordinary user journeys. It leads with four high-impact tasks and keeps every other confirmed gap in a compact next-actions table. It inspects existing tests and CI but does not run project code unless the user asks or a finding needs runtime reproduction.
+Audit mode gives a technical-readiness verdict for ordinary user journeys and a complete target design. It labels proposed components as reuse, extension, addition, or conditional, leads with four high-impact tasks, and keeps every other confirmed gap in a compact next-actions table. It inspects existing tests and CI but does not run project code unless the user asks or a finding needs runtime reproduction.
 
 The implementation is code-first. The skill does not create inventories, decision logs, gap reports, policy summaries, or documentation trees unless the user asks.
 
@@ -83,13 +83,13 @@ Open Codex in the API repository. Then invoke the skill explicitly.
 ### Technical-readiness audit
 
 ```text
-$chile-data-protection-api Audit this API against the complete amended Chilean personal-data framework effective 1 December 2026. Tell me whether ordinary users can use it safely. Lead with the four highest-impact implementation tasks, then list every remaining confirmed gap in a compact next-actions table. Include exact routes, jobs, data changes, security controls, tests to add, and file evidence. Do not modify files or run project tests.
+$chile-data-protection-api Audit this API against the complete amended Chilean personal-data framework effective 1 December 2026. Tell me whether ordinary users can use it safely. Give me a complete target design, not only the first delivery slice. Mark each component as reuse, extend, add, or conditional. Lead with the four highest-impact implementation tasks, then list every remaining confirmed gap in a compact next-actions table. Include exact routes, jobs, data changes, security controls, tests to add, and file evidence. Do not modify files or run project tests.
 ```
 
 ### API design review
 
 ```text
-$chile-data-protection-api Review this API design for Chilean personal-data processing. Recommend the exact endpoints, internal jobs, data model, migrations, security controls, and practical defaults. Separate legal minimums from optional strict security.
+$chile-data-protection-api Review this API design for Chilean personal-data processing. Give me the complete target architecture and implementation order. Recommend exact endpoints, internal jobs, data models, migrations, security controls, tests, and practical defaults for every applicable capability. Mark each component as reuse, extend, add, or conditional. Reuse current authentication, status, artifact, notice, incident, and configuration mechanisms when they already provide the required behavior. Separate legal minimums from optional strict security.
 ```
 
 ### Implement rights-request intake

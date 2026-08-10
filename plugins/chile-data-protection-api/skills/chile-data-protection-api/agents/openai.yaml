@@ -1,7 +1,7 @@
 interface:
   display_name: "Chile Data Protection API"
   short_description: "Build law-ready Chilean API capabilities"
-  default_prompt: "Use $chile-data-protection-api to audit or implement a repository-first Chilean personal-data API solution against the complete amended framework effective 1 December 2026. Give a technical-readiness verdict and exact routes, jobs, data changes, security controls, and tests."
+  default_prompt: "Use $chile-data-protection-api to audit or implement a complete repository-first Chilean personal-data API solution against the amended framework effective 1 December 2026. Reuse existing mechanisms and give exact routes, jobs, data changes, security controls, and tests."
 
 policy:
   allow_implicit_invocation: true

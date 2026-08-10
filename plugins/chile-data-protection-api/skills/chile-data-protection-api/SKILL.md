@@ -98,6 +98,15 @@ For each technical decision:
 3. Implement it when the user asked for code changes
 4. Explain alternatives only when another option has a material current tradeoff
 
+For an audit or design review, show the complete target design for every applicable amended-law capability. Completeness means covering the required behavior, not creating a separate privacy subsystem. Mark each proposed component with one plain disposition:
+
+- `Reuse` when an existing route, service, model, job, or operator flow already satisfies the behavior
+- `Extend` when an existing mechanism needs fields, states, authorization, or failure handling
+- `Add` when no suitable mechanism exists and the capability is applicable
+- `Conditional` when the component is useful only if a stated product or integration condition is true
+
+Support every disposition with repository evidence. For `Conditional`, name the trigger and the existing mechanism to inspect before adding it. If an endpoint is shown as a useful API shape, state that an equivalent existing surface should be reused when present. Keep the complete target design separate from the order in which it should be implemented.
+
 For each missing legal or business fact:
 
 1. Explain the required fact in developer terms
@@ -127,12 +136,14 @@ Persist versions only when historical values affect behavior or evidence. Notice
 
 ## Select the operating mode
 
-### Audit only
+### Audit or design review
 
 - Inspect the repository and runtime topology
 - Answer whether ordinary user journeys are technically ready for the complete amended framework effective 1 December 2026
 - Use one verdict: `technically ready`, `ready with limitations`, or `not technically ready`
-- Produce a concrete remediation plan with exact file and symbol references
+- Produce a complete target design and concrete remediation plan with exact file and symbol references
+- Cover every applicable amended-law capability even when only the highest-impact work is explained in detail
+- Reuse or extend current API, authentication, status, artifact, workflow, incident, and configuration mechanisms before adding privacy-specific ones
 - Select the route, job, command, migration, or configuration boundary that fits the repository
 - Inspect existing tests and CI as evidence, but do not run tests, builds, scanners, containers, services, or network probes by default
 - Run a command that executes project code only when the user asks or a confirmed finding requires runtime reproduction
@@ -182,9 +193,11 @@ Follow ingress, storage, jobs, vendors, telemetry, exports, deletion, and backup
 
 Keep the trace in working analysis. Do not create an inventory, gap report, or decision file unless the user requests one.
 
-### 4. Implement one vertical slice
+### 4. Design the complete target or implement one vertical slice
 
-Build the smallest end-to-end behavior that solves the request. Include authorization, persistence, failure handling, and tests.
+For an audit or design review, cover the full target architecture for every applicable capability. Use `Reuse`, `Extend`, `Add`, or `Conditional` and give enough contract, data, security, migration, job, and test detail to support a later implementation plan. Do not omit a required component merely to make the first delivery smaller.
+
+For an implementation request, build the smallest end-to-end behavior that solves the requested slice. Include authorization, persistence, failure handling, and tests.
 
 Do not scaffold unrelated rights, incidents, consent, retention, adapters, or administration features.
 
@@ -225,15 +238,17 @@ Do not call an implementation complete because controllers and tables exist.
 For an audit, return:
 
 1. A technical-readiness verdict for ordinary users
-2. `Do this first` with the four highest-impact implementation tasks
-3. `Next actions` with every remaining confirmed gap in a compact table
-4. Any real law-bound production limit
-5. Strict security additions in a separate optional section
+2. A compact applicability review for portability, significant automated decisions or profiling, sensitive or specially protected data, children, Article 15 ter impact assessment, processors, international transfers, and personal-data incidents
+3. `Do this first` with the four highest-impact implementation tasks
+4. `Next actions` with every remaining confirmed gap and conditional component in a compact table
+5. Any real law-bound production limit
+6. Strict security additions in a separate optional section
 
 Use one implementation plan for the complete amended framework. Do not split required work into current-law and post-effective-date backlogs.
 
 For each implementation task, use this compact shape:
 
+- `Decision`: reuse, extend, add, or conditional
 - `Surface`: exact endpoint, job, command, event, or configuration boundary
 - `Build`: contract, data model, migration, and ordered implementation steps
 - `Security`: authorization, validation, telemetry, and abuse controls
@@ -243,11 +258,19 @@ For each implementation task, use this compact shape:
 
 Choose an endpoint only when a user or operator needs a request boundary. Use the existing scheduler or command system for internal retention work.
 
+For notice delivery, prefer an existing catalog or versioned configuration. Add notice-authoring endpoints only when runtime authoring, approval, publication, multiple delivery channels, or non-developer ownership requires them.
+
+For request verification and result delivery, reuse current authentication, recovery, session, request-status, and secure artifact patterns. Add dedicated verification or result endpoints only when unauthenticated requesters, representatives, one-time verification, or protected result retrieval cannot fit those patterns.
+
+For incidents, reuse or extend the current incident system. Offer a privacy-incident API shape as `Conditional` when the API must own intake, assessment, notification, or recovery. Do not require a parallel endpoint when an existing incident platform already provides the behavior.
+
 Do not add a table, event history, queue, or service unless the task explains why the existing persistence, audit, job, or service boundary cannot satisfy the behavior.
 
 Keep each task under 120 words, excluding code. Include at most two code examples of 20 lines each. Adapt them to existing types and libraries.
 
-Use `Priority`, `Gap`, `Required change`, `Surface`, `Evidence`, and `Basis` columns for the next-actions table. Keep each row to one line.
+Use `Priority`, `Decision`, `Gap or condition`, `Required change`, `Surface`, `Evidence`, and `Basis` columns for the next-actions table. Keep each row to one line.
+
+In the applicability review, use `applicable`, `not applicable`, or `unknown`. Give one line of repository evidence and the implementation effect. An unknown trigger is a limitation, not a confirmed gap. Do not rank a conditional component as required work until its trigger is established.
 
 Do not omit or merge away a confirmed gap to satisfy the four-task lead section or a word target.
 
@@ -263,6 +286,8 @@ Lead with the code result. Explain legal rules through API behavior, data flow, 
 Do not repeat the packaged legal background or source list. Include source links only for requested research or when a legal blocker needs direct support.
 
 Keep alternatives limited to decisions that change the current implementation. Never describe a stricter-control omission as legal noncompliance. Do not repeat blocker text.
+
+Treat migration and contract checks as delivery verification for a recommended data or API change. Do not label a generic missing migration-upgrade CI test as a personal-data law gap.
 
 If source code only lacks legal or organizational evidence, report a limitation. Do not convert that absence into a production blocker.
 

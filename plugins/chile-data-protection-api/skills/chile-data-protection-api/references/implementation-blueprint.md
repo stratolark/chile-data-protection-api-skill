@@ -16,6 +16,8 @@ Use immutable notice versions when the system must prove which content was shown
 
 Keep notice presentation, terms acceptance, and optional consent as separate facts. Keep draft content unpublished.
 
+Reuse an existing content catalog, versioned configuration, or deployment-managed resource when it can publish the required content and preserve the version shown. Add notice-authoring or publication endpoints only when content must change at runtime, requires approval, serves multiple channels, or is owned by non-developers. A privacy-notice CMS is not the default.
+
 ## Consent
 
 Record grant and withdrawal durably by purpose. Reuse the current audit or history mechanism. Add a current-state projection only when a read path needs it.
@@ -58,6 +60,8 @@ Choose the least intrusive method that gives enough confidence for the action. P
 
 Verify representative authority separately. Do not retain identity documents by default. If evidence must be uploaded, apply current access control, protected storage, malware checks, and short-lived cleanup.
 
+Reuse current authentication, recovery, and session endpoints. Add a dedicated verification endpoint only for a requester or representative who cannot use those flows, or when one-time verification must have its own lifecycle and abuse controls.
+
 ## Connecting data stores
 
 Use each domain's existing service or repository boundary. Introduce a shared contract only when several current stores need the same operation or it isolates a current processor boundary.
@@ -74,6 +78,8 @@ Each store operation must distinguish success, an applicable exclusion, a retrya
 - Remove artifacts under the configured retention rule
 
 For direct transfer, use verified destinations or current allowlisted connectors. Protect them from SSRF, redirects, DNS rebinding, and partial delivery. Never post personal data to an arbitrary user-provided URL.
+
+Reuse the current request-status and secure artifact retrieval surface. Add a dedicated result endpoint only when the existing contract cannot authorize, expire, and deliver the result safely.
 
 ## Rectification
 
@@ -100,6 +106,8 @@ Fail safely when a required block state is unavailable. Permit only processing a
 
 Reuse an existing deletion marker, audit mechanism, or replay protection. Add a tombstone only when restoration or asynchronous replay can recreate the data and no current mechanism prevents it. Use dry runs and bounded batches when scope or recovery risk warrants them.
 
+Do not disable every irreversible erasure path while waiting for one organization-wide retention decision. Implement confirmed Article 7 grounds and exceptions, then route uncertain exceptions to manual review. Keep scheduled or bulk deletion for a specific category in dry-run mode only when its purpose, retention start event, hold coverage, or recovery behavior is unresolved. Describe engineering dry run as a safety control, not a legal approval gate.
+
 ## RUT storage and migration
 
 Treat natural-person RUT as personal data, not authentication.
@@ -117,6 +125,8 @@ Use established encryption and keyed-hashing libraries. Keep keys outside the pr
 ## Retention and legal holds
 
 Model retention by current purpose and data category when their rules differ. Use an existing configured value unless the repository marks it as a draft or placeholder.
+
+Ground retention in Article 3 proportionality and erasure in Article 7. Article 8 ter governs temporary blocking and does not supply a retention period.
 
 If no value exists, select a configurable provisional default from the purpose and lifecycle. Use these defaults for short-lived technical artifacts when no repository rule applies:
 
@@ -137,6 +147,8 @@ Reuse current vendor, webhook, or delivery records. Store only metadata needed t
 ## Incidents
 
 Reuse the security incident workflow. Add personal-data impact fields only when the current incident process needs them.
+
+Offer an API-owned incident surface only when the API must receive reports, drive assessment, record notifications, or expose authorized recovery actions. Otherwise extend the existing incident platform and its integration. Do not create a parallel privacy incident service merely to expose a suggested route.
 
 Create an authority-submission boundary only when a verified interface or current destination exists. Do not hard-code an Agency endpoint or payload before an official interface exists.
 

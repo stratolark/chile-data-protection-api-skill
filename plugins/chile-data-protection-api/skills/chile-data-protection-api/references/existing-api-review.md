@@ -71,6 +71,30 @@ Search for current mechanisms before proposing a privacy-specific subsystem:
 
 Describe how the existing mechanism can be extended. Add a new component only when the current boundary cannot preserve a required invariant or failure state.
 
+Classify each proposed component as `Reuse`, `Extend`, `Add`, or `Conditional`. Require exact repository evidence for every decision. For `Conditional`, name the trigger and the existing mechanism to inspect first. A complete design covers every applicable capability without forcing a new endpoint, table, job, or service for each one.
+
+Examples of preferred reuse:
+
+- Use the current authentication or recovery flow instead of a dedicated verification endpoint when it provides enough confidence
+- Use the current request status and artifact retrieval flow instead of separate result endpoints
+- Use a versioned configuration or content catalog for privacy notices unless runtime authoring and publication require administration APIs
+- Extend the current incident workflow with personal-data assessment fields instead of creating a parallel incident service
+
+## Applicability review
+
+For every audit or design review, classify these triggers as `applicable`, `not applicable`, or `unknown`:
+
+- Portability based on automated processing and consent
+- Significant automated decisions or profiling
+- Sensitive or specially protected data
+- Children's data
+- Article 15 ter impact assessment
+- Processors
+- International transfers
+- Personal-data incidents
+
+Give repository evidence and the implementation effect for each result. Do not treat `unknown` as a confirmed code gap. Do not mark a capability `not applicable` merely because no dedicated route or table exists.
+
 ## Confirm findings
 
 A technical gap needs repository evidence of missing or unsafe behavior. Distinguish it from:
@@ -93,6 +117,8 @@ When stored data or a public contract must change, inspect:
 - Logging and metrics used during migration
 
 Use `implementation-blueprint.md` for the selected migration design and `engineering-postures.md` for identifier protection. Do not recommend replacing an existing identifier until the current exposure and compatibility constraints are known.
+
+Migration and contract tests support safe delivery of a recommended change. A generic missing migration-upgrade CI test is not itself a personal-data law gap.
 
 ## Runtime and operational evidence
 
