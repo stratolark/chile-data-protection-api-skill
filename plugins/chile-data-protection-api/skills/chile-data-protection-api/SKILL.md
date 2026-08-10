@@ -1,6 +1,6 @@
 ---
 name: chile-data-protection-api
-description: Audit, design, and implement developer-ready backend API capabilities for Chilean personal-data processing under Law No. 19.628 and the amendments made by Law No. 21.719. Use for Chile-scoped API audits, RUT handling, privacy notices, data-subject rights, consent, retention, blocking, erasure, portability, automated decisions, incidents, downstream propagation, or choosing between a legal baseline and stricter security controls. Recommend and implement a concrete solution in the repository's style. Prefer functional code, runtime configuration, migrations, and tests over policy documents. Refresh legal sources only when the user asks. Do not use to claim legal compliance or replace Chilean legal counsel.
+description: Audit, design, and implement developer-ready backend API capabilities for Chilean personal-data processing against the complete Law No. 19.628 framework amended by Law No. 21.719 and scheduled to apply from 1 December 2026. Use for Chile-scoped API audits, RUT handling, privacy notices, data-subject rights, consent, retention, blocking, erasure, portability, automated decisions, incidents, downstream propagation, or choosing between a legal baseline and stricter security controls. Treat the amended framework as the default engineering target even before its effective date. Recommend and implement a concrete solution in the repository's style. Prefer functional code, runtime configuration, migrations, and tests over policy documents. Refresh legal sources only when the user asks. Do not use to claim legal compliance or replace Chilean legal counsel.
 ---
 
 # Chilean personal-data API implementation
@@ -20,7 +20,7 @@ This is an engineering workflow, not a legal opinion.
 - Use plain descriptions instead of internal ticket codes or classification tags
 - Make technical decisions from repository evidence and standard software practice
 - Do not wait for legal approval of route names, schemas, module boundaries, identifier formats, validation code, test design, or other technical choices
-- Disable a production action only when a missing fact is a legal precondition for that exact action under the selected regime or a verified sector rule
+- Disable a production action only when a missing fact is a legal precondition for that exact action under the complete amended framework or a verified sector rule
 - Cite the rule that creates a legal blocker and name the one action that remains disabled
 - Treat legal uncertainty by itself as a limitation, not a blocker
 - Do not infer that a purpose, lawful basis, notice, contract, or organizational control is absent only because source code does not contain it
@@ -43,7 +43,7 @@ An organization's approval workflow can still constrain deployment. Report it as
 - Read `references/implementation-blueprint.md` only for the capability being implemented or designed
 - Read `references/security-testing-dod.md` before finalizing an audit or implementation, then apply only the sections relevant to the changed behavior
 
-## Select the applicable law
+## Use the complete amended framework by default
 
 Use the packaged legal baseline by default. Do not browse or refresh sources because the skill loaded.
 
@@ -52,18 +52,20 @@ Use current source research only when the user asks to browse, refresh, verify, 
 With the packaged baseline:
 
 1. Read its verification date and official URLs
-2. Determine when the processing or deployment occurs
-3. State one applicable period in plain language:
-   - Current law through 30 November 2026
-   - Transition preparation for the reform scheduled for 1 December 2026
-   - Amended law from 1 December 2026, once verified in force
-4. State the packaged verification date in one line
+2. Use the complete amended Law No. 19.628 framework scheduled for 1 December 2026 as the required engineering target
+3. Audit every applicable amended-law capability, including rights, deadlines, portability, automated decisions, privacy by design, security, incidents, processors, and transfers
+4. State `Engineering target: complete amended framework effective 1 December 2026`
+5. State the packaged verification date in one line
 
-For requested source research, use primary official sources first. Check later legislation, the transition schedule, official regulations, Agency instructions, and applicable sector rules. State the access date and URLs.
+Do not omit, downgrade, or defer an implementation gap because the audit occurs before 1 December 2026. Do not label amended-law work as optional future work.
+
+Use the current-law period only when the user expressly asks for a current-law-only assessment or when answering whether a duty is legally enforceable before 1 December 2026. Even then, keep the complete amended-framework implementation plan unless the user explicitly removes it from scope.
+
+For requested source research, use primary official sources first. Check later legislation, the effective date, official regulations, Agency instructions, and applicable sector rules. State the access date and URLs.
 
 Do not copy legal source lists or research notes into the repository unless the user requests that artifact.
 
-When the request date is unclear, apply current law to current legal claims and describe reform work as transition preparation. Do not present deferred rights, deadlines, Agency powers, or sanctions as current requirements.
+Before 1 December 2026, do not falsely state that the amended framework is already legally enforceable. This timing note must not change the technical verdict, priorities, defaults, or implementation scope.
 
 If the target date falls outside the packaged baseline, offer a source refresh. Continue reversible engineering work without running the refresh until the user asks.
 
@@ -74,7 +76,7 @@ Choose one posture from `references/engineering-postures.md`:
 - Legal baseline
 - Strict security default
 
-The legal period determines which law applies. The security posture determines how conservative the technical controls are beyond exact statutory requirements.
+The complete amended framework is the default legal target. The security posture determines how conservative the technical controls are beyond its statutory requirements.
 
 - Honor an explicit user selection
 - For an audit without a selection, separate legal gaps from stricter security recommendations
@@ -128,7 +130,7 @@ Persist versions only when historical values affect behavior or evidence. Notice
 ### Audit only
 
 - Inspect the repository and runtime topology
-- Answer whether ordinary user journeys are technically ready under the selected legal period
+- Answer whether ordinary user journeys are technically ready for the complete amended framework effective 1 December 2026
 - Use one verdict: `technically ready`, `ready with limitations`, or `not technically ready`
 - Produce a concrete remediation plan with exact file and symbol references
 - Select the route, job, command, migration, or configuration boundary that fits the repository
@@ -137,6 +139,7 @@ Persist versions only when historical values affect behavior or evidence. Notice
 - Do not modify files
 - Rank findings by legal, security, operational, and delivery impact
 - Separate confirmed gaps from facts that need legal or business input
+- Treat an amended-law capability as not applicable only when the product does not perform the processing that triggers it, never because the effective date has not arrived
 
 ### Implement in an existing API
 
@@ -159,7 +162,7 @@ Persist versions only when historical values affect behavior or evidence. Notice
 
 ### 1. Establish scope
 
-Determine the applicable legal period, security posture, controller or processor role, tenant boundary, users, data subjects, personal-data fields, high-risk data, processors, recipients, and international transfers.
+Confirm the complete amended framework as the target, then determine the security posture, controller or processor role, tenant boundary, users, data subjects, personal-data fields, high-risk data, processors, recipients, and international transfers.
 
 For a normal audit, collect only the facts needed to evaluate ordinary user journeys and the highest-impact gaps. Perform an exhaustive inventory only when the user asks.
 
@@ -227,6 +230,8 @@ For an audit, return:
 4. Any real law-bound production limit
 5. Strict security additions in a separate optional section
 
+Use one implementation plan for the complete amended framework. Do not split required work into current-law and post-effective-date backlogs.
+
 For each implementation task, use this compact shape:
 
 - `Surface`: exact endpoint, job, command, event, or configuration boundary
@@ -234,7 +239,7 @@ For each implementation task, use this compact shape:
 - `Security`: authorization, validation, telemetry, and abuse controls
 - `Tests`: no more than five behavior tests to add
 - `Evidence`: one line with exact files or symbols
-- `Basis and reuse`: legal minimum, required risk control, or optional strict security, plus the repository mechanism reused
+- `Basis and reuse`: amended-law requirement, required risk control, or optional strict security, plus the repository mechanism reused
 
 Choose an endpoint only when a user or operator needs a request boundary. Use the existing scheduler or command system for internal retention work.
 

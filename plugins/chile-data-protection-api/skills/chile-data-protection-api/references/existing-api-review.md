@@ -77,8 +77,7 @@ A technical gap needs repository evidence of missing or unsafe behavior. Disting
 
 - A legal or business fact not represented in source code
 - An optional strict-security improvement
-- A future amended-law capability that is not currently in force
-- A capability that is not applicable to the product
+- An amended-law capability whose triggering conditions are absent from the product's actual processing
 
 For every confirmed gap, identify the affected journey, data flow, implementation surface, security controls, tests, and evidence. Keep findings in the response unless the user requests a repository artifact.
 

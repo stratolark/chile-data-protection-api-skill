@@ -33,7 +33,7 @@ Reuse an existing case or workflow model when it can preserve:
 - Pending, completed, partial, refused, and cancelled outcomes needed by the flow
 - Result and reason communicated to the requester
 
-Keep deadline, temporary block, and execution outcome separate when combining them would allow invalid states. Reuse the existing audit trail unless current transitions require evidence it cannot preserve.
+Keep deadline, temporary block, and execution outcome separate when combining them would allow invalid states. Reuse the existing audit trail unless workflow transitions require evidence it cannot preserve.
 
 ## Deadlines
 

@@ -4,7 +4,7 @@ An installable Codex skill for auditing, designing, and implementing backend API
 
 The skill covers RUT handling, privacy notices, consent, data-subject requests, retention, blocking, erasure, portability, automated decisions, incidents, and downstream propagation. It adapts its recommendations to the host repository instead of imposing a framework or fixed API design.
 
-For audits and implementations, it keeps the applicable legal regime separate from the chosen engineering posture:
+For audits and implementations, it uses the complete amended Law No. 19.628 framework scheduled for 1 December 2026 as the default engineering target. It keeps that legal baseline separate from the chosen security posture:
 
 - **Legal baseline** implements verified legal requirements and the least-complex controls justified by actual risk.
 - **Strict security default** adds conservative identifier, encryption, lookup, telemetry, export, and abuse-resistance defaults.
@@ -24,12 +24,14 @@ Every posture keeps normal production engineering practices. Strict mode strengt
 > [!IMPORTANT]
 > This project is an engineering aid. It does not provide legal advice, certify compliance, or replace review by qualified Chilean legal counsel.
 
-## Legal status
+## Legal target
 
 The skill uses its packaged legal baseline by default. It does not browse or refresh legal sources every time it loads.
 
 - Law No. 19.628 remains the current consolidated regime through November 30, 2026.
 - The principal amendments introduced by Law No. 21.719 are scheduled to enter into force on December 1, 2026.
+- Audits and implementations use the complete amended framework as required scope now. They do not defer portability, automated-decision safeguards, amended deadlines, or other applicable capabilities because the effective date has not arrived.
+- Before December 1, the skill notes the current legal status without weakening the technical verdict or implementation plan.
 - The user can request a source refresh when current legal research is needed.
 - If a deployment date falls outside the packaged baseline, the skill offers a refresh and continues reversible engineering work.
 
@@ -81,7 +83,7 @@ Open Codex in the API repository. Then invoke the skill explicitly.
 ### Technical-readiness audit
 
 ```text
-$chile-data-protection-api Audit this API under current Chilean personal-data law. Tell me whether ordinary users can use it safely. Lead with the four highest-impact implementation tasks, then list every remaining confirmed gap in a compact next-actions table. Include exact routes, jobs, data changes, security controls, tests to add, and file evidence. Do not modify files or run project tests.
+$chile-data-protection-api Audit this API against the complete amended Chilean personal-data framework effective 1 December 2026. Tell me whether ordinary users can use it safely. Lead with the four highest-impact implementation tasks, then list every remaining confirmed gap in a compact next-actions table. Include exact routes, jobs, data changes, security controls, tests to add, and file evidence. Do not modify files or run project tests.
 ```
 
 ### API design review
@@ -111,7 +113,7 @@ $chile-data-protection-api Use the legal baseline. Also add encrypted recoverabl
 ### Refresh legal sources
 
 ```text
-$chile-data-protection-api Refresh the official Chilean legal sources first. Then review this API for a deployment planned after 1 December 2026. Cite the official sources that changed the implementation plan.
+$chile-data-protection-api Refresh the official Chilean legal sources first. Then revalidate this API against the complete amended framework. Cite the official sources that changed the implementation plan.
 ```
 
 The skill does not activate for generic CRUD, non-Chilean GDPR work, privacy-policy copywriting, or requests for a final legal opinion.

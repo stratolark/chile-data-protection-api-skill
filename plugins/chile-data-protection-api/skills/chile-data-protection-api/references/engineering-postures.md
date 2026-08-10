@@ -1,10 +1,10 @@
 # Engineering postures
 
-Select security controls separately from the applicable legal period. A posture does not decide the processing purpose, lawful basis, retention period, legal hold, controller role, or statutory exception.
+Select security controls separately from the complete amended-framework target. A posture does not decide the processing purpose, lawful basis, retention period, legal hold, controller role, or statutory exception.
 
 ## Choose one posture
 
-- **Legal baseline**: Implement the behavior required by the applicable Chilean regime with proportionate security based on the repository's actual risk
+- **Legal baseline**: Implement the behavior required by the complete amended Chilean framework with proportionate security based on the repository's actual risk
 - **Strict security default**: Apply the legal baseline plus conservative controls for identifiers, storage, lookup, telemetry, exports, and enumeration
 
 Honor the user's choice. For an audit without a choice, report legal gaps separately from optional strict controls. For implementation without a choice, recommend the strict security default as a reversible assumption.
@@ -15,7 +15,7 @@ Individual strict controls can be added to the legal baseline without creating a
 
 Use these descriptions only when the distinction changes the decision:
 
-- `Law`: required by a cited applicable provision
+- `Law`: required by a cited provision in the complete amended framework
 - `Required risk control`: needed to make the current design safe or reliable
 - `Standard engineering practice`: established repository or platform practice
 - `Strict security`: optional hardening beyond the legal minimum
